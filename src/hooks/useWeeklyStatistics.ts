@@ -1,22 +1,13 @@
 import { useState, useEffect } from 'react'
-import dayjs from 'dayjs'
-import type { WeeklyStatisticsView } from '../types/statistics'
 
-const simulateStatistics = async (): Promise<WeeklyStatisticsView> => {
-  await new Promise((resolve) => setTimeout(resolve, 120))
-  return {
-    weekStartLabel: dayjs().startOf('week').add(1, 'day').format('M월 D일 ~ M월 D일'),
-    deepWorkMinutes: 620,
-    adminWorkMinutes: 180,
-    totalMinutes: 900,
-    deepWorkRatio: 620 / 900,
-    adminWorkRatio: 180 / 900,
-  }
-}
+import { fetchWeeklyStatistics } from '../api/statistics'
+import { toWeeklyStatisticsView } from '../utils/statisticsTransform'
+import type { WeeklyStatisticsView } from '../types/statistics'
 
 type UseWeeklyStatisticsReturn = {
   stats: WeeklyStatisticsView | null
   isLoading: boolean
+  error: string | null
   refetch: () => void
 }
 
@@ -24,14 +15,19 @@ const useWeeklyStatistics = (): UseWeeklyStatisticsReturn => {
   const [stats, setStats] = useState<WeeklyStatisticsView | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [timestamp, setTimestamp] = useState(() => Date.now())
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
     const fetchStats = async () => {
       setIsLoading(true)
+      setError(null)
       try {
-        const response = await simulateStatistics()
-        if (isMounted) setStats(response)
+        const response = await fetchWeeklyStatistics()
+        const view = toWeeklyStatisticsView(response)
+        if (isMounted) setStats(view)
+      } catch (err) {
+        if (isMounted) setError('통계를 불러오는데 실패했습니다.')
       } finally {
         if (isMounted) setIsLoading(false)
       }
@@ -45,6 +41,7 @@ const useWeeklyStatistics = (): UseWeeklyStatisticsReturn => {
   return {
     stats,
     isLoading,
+    error,
     refetch: () => setTimestamp(Date.now()),
   }
 }
