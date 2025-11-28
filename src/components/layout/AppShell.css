@@ -9,6 +9,7 @@
   flex: 1;
   min-height: 0;
   padding: 16px;
+  padding-bottom: 120px;
 }
 
 @media (min-width: 768px) {
@@ -19,4 +20,3 @@
     border-right: 1px solid #e2e8f0;
   }
 }
-

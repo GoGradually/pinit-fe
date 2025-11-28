@@ -1,27 +1,7 @@
+import { fetchScheduleDetail } from '../api/schedules'
+import { useScheduleCache } from '../context/ScheduleCacheContext'
 import { useEffect, useState } from 'react'
 import type { ScheduleResponse } from '../types/schedule'
-import dayjs from 'dayjs'
-
-const simulateScheduleDetail = async (id: number): Promise<ScheduleResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 180))
-  const now = dayjs().tz().format('YYYY-MM-DD')
-  return {
-    id,
-    ownerId: 1,
-    title: '집중 작업 루틴 맞추기',
-    description: '맞물린 선행 일정과 중요도/긴급도 균형 확인',
-    date: `${now}T09:00:00+09:00[Asia/Seoul]`,
-    deadline: `${now}T12:00:00+09:00[Asia/Seoul]`,
-    importance: 7,
-    urgency: 6,
-    taskType: 'DEEP_WORK',
-    state: 'IN_PROGRESS',
-    estimatedMinutes: 180,
-    actualMinutes: 45,
-    createdAt: now,
-    updatedAt: now,
-  }
-}
 
 type UseScheduleDetailReturn = {
   schedule: ScheduleResponse | null
@@ -34,6 +14,7 @@ const useScheduleDetail = (scheduleId?: string): UseScheduleDetailReturn => {
   const [schedule, setSchedule] = useState<ScheduleResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [timestamp, setTimestamp] = useState(() => Date.now())
+  const { upsertSchedule } = useScheduleCache()
 
   useEffect(() => {
     if (!numericId) return
@@ -42,9 +23,10 @@ const useScheduleDetail = (scheduleId?: string): UseScheduleDetailReturn => {
     const fetchSchedule = async () => {
       setIsLoading(true)
       try {
-        const response = await simulateScheduleDetail(numericId)
+        const response = await fetchScheduleDetail(numericId)
         if (isMounted) {
           setSchedule(response)
+          upsertSchedule(response)
         }
       } finally {
         if (isMounted) {
@@ -58,7 +40,7 @@ const useScheduleDetail = (scheduleId?: string): UseScheduleDetailReturn => {
     return () => {
       isMounted = false
     }
-  }, [numericId, timestamp])
+  }, [numericId, timestamp, upsertSchedule])
 
   return {
     schedule,
@@ -68,4 +50,3 @@ const useScheduleDetail = (scheduleId?: string): UseScheduleDetailReturn => {
 }
 
 export default useScheduleDetail
-

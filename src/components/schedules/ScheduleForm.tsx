@@ -1,6 +1,12 @@
 import useScheduleForm from '../../hooks/useScheduleForm'
-import type { ScheduleTaskType } from '../../types/schedule'
+import type { ScheduleTaskType, ScheduleFormValues } from '../../types/schedule'
 import './ScheduleForm.css'
+
+type ScheduleFormProps = {
+  initialValues?: Partial<ScheduleFormValues>
+  onSubmit: (values: ScheduleFormValues) => Promise<void>
+  submitLabel?: string
+}
 
 const taskTypeOptions: { value: ScheduleTaskType; label: string }[] = [
   { value: 'DEEP_WORK', label: '집중 작업' },
@@ -14,62 +20,71 @@ const dependencyMockOptions = [
   { id: 103, title: '리뷰 일정' },
 ]
 
-const ScheduleForm = () => {
-  const { values, errors, isSubmitting, onChange, onSubmit, reset } = useScheduleForm()
+const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }: ScheduleFormProps) => {
+  const form = useScheduleForm({ initialValues })
 
   const toggleId = (list: number[], id: number) =>
     list.includes(id) ? list.filter((item) => item !== id) : [...list, id]
 
   const handlePreviousToggle = (id: number) => {
-    const updated = toggleId(values.previousTaskIds, id)
-    onChange('previousTaskIds', updated)
-    if (values.nextTaskIds.includes(id)) {
-      onChange('nextTaskIds', values.nextTaskIds.filter((item) => item !== id))
+    const updated = toggleId(form.values.previousTaskIds, id)
+    form.onChange('previousTaskIds', updated)
+    if (form.values.nextTaskIds.includes(id)) {
+      form.onChange('nextTaskIds', form.values.nextTaskIds.filter((item) => item !== id))
     }
   }
 
   const handleNextToggle = (id: number) => {
-    const updated = toggleId(values.nextTaskIds, id)
-    onChange('nextTaskIds', updated)
-    if (values.previousTaskIds.includes(id)) {
-      onChange('previousTaskIds', values.previousTaskIds.filter((item) => item !== id))
+    const updated = toggleId(form.values.nextTaskIds, id)
+    form.onChange('nextTaskIds', updated)
+    if (form.values.previousTaskIds.includes(id)) {
+      form.onChange('previousTaskIds', form.values.previousTaskIds.filter((item) => item !== id))
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!form.validate()) return
+    form.setSubmitting(true)
+    try {
+      await onSubmit(form.values)
+      form.reset()
+    } finally {
+      form.setSubmitting(false)
     }
   }
 
   return (
     <form
       className="schedule-form"
-      onSubmit={(event) => {
-        event.preventDefault()
-        onSubmit()
-      }}
+      onSubmit={handleSubmit}
     >
       <label className="schedule-form__field">
         <span>일정 제목</span>
         <input
-          value={values.title}
-          onChange={(event) => onChange('title', event.target.value)}
+          value={form.values.title}
+          onChange={(event) => form.onChange('title', event.target.value)}
           placeholder="예: 마케팅 전략 미팅"
         />
-        {errors.title && <small>{errors.title}</small>}
+        {form.errors.title && <small>{form.errors.title}</small>}
       </label>
 
       <label className="schedule-form__field">
         <span>설명</span>
         <textarea
-          value={values.description}
-          onChange={(event) => onChange('description', event.target.value)}
+          value={form.values.description}
+          onChange={(event) => form.onChange('description', event.target.value)}
           placeholder="세부 설명을 입력해 주세요"
           rows={3}
         />
-        {errors.description && <small>{errors.description}</small>}
+        {form.errors.description && <small>{form.errors.description}</small>}
       </label>
 
       <label className="schedule-form__field">
         <span>일정 타입</span>
         <select
-          value={values.taskType}
-          onChange={(event) => onChange('taskType', event.target.value as ScheduleTaskType)}
+          value={form.values.taskType}
+          onChange={(event) => form.onChange('taskType', event.target.value as ScheduleTaskType)}
         >
           {taskTypeOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -85,10 +100,10 @@ const ScheduleForm = () => {
           type="number"
           min={1}
           max={9}
-          value={values.importance}
-          onChange={(event) => onChange('importance', Number(event.target.value))}
+          value={form.values.importance}
+          onChange={(event) => form.onChange('importance', Number(event.target.value))}
         />
-        {errors.importance && <small>{errors.importance}</small>}
+        {form.errors.importance && <small>{form.errors.importance}</small>}
       </label>
 
       <label className="schedule-form__field">
@@ -97,18 +112,18 @@ const ScheduleForm = () => {
           type="number"
           min={1}
           max={9}
-          value={values.urgency}
-          onChange={(event) => onChange('urgency', Number(event.target.value))}
+          value={form.values.urgency}
+          onChange={(event) => form.onChange('urgency', Number(event.target.value))}
         />
-        {errors.urgency && <small>{errors.urgency}</small>}
+        {form.errors.urgency && <small>{form.errors.urgency}</small>}
       </label>
 
       <label className="schedule-form__field">
         <span>시작 시간</span>
         <input
           type="datetime-local"
-          value={values.date.toISOString().slice(0, 16)}
-          onChange={(event) => onChange('date', new Date(event.target.value))}
+          value={form.values.date.toISOString().slice(0, 16)}
+          onChange={(event) => form.onChange('date', new Date(event.target.value))}
         />
       </label>
 
@@ -116,10 +131,10 @@ const ScheduleForm = () => {
         <span>마감 시간</span>
         <input
           type="datetime-local"
-          value={values.deadline.toISOString().slice(0, 16)}
-          onChange={(event) => onChange('deadline', new Date(event.target.value))}
+          value={form.values.deadline.toISOString().slice(0, 16)}
+          onChange={(event) => form.onChange('deadline', new Date(event.target.value))}
         />
-        {errors.deadline && <small>{errors.deadline}</small>}
+        {form.errors.deadline && <small>{form.errors.deadline}</small>}
       </label>
 
       <section className="schedule-form__dependency">
@@ -134,7 +149,7 @@ const ScheduleForm = () => {
               <label key={option.id} className="schedule-form__checkbox">
                 <input
                   type="checkbox"
-                  checked={values.previousTaskIds.includes(option.id)}
+                  checked={form.values.previousTaskIds.includes(option.id)}
                   onChange={() => handlePreviousToggle(option.id)}
                 />
                 <span>{option.title}</span>
@@ -147,7 +162,7 @@ const ScheduleForm = () => {
               <label key={option.id} className="schedule-form__checkbox">
                 <input
                   type="checkbox"
-                  checked={values.nextTaskIds.includes(option.id)}
+                  checked={form.values.nextTaskIds.includes(option.id)}
                   onChange={() => handleNextToggle(option.id)}
                 />
                 <span>{option.title}</span>
@@ -158,11 +173,11 @@ const ScheduleForm = () => {
       </section>
 
       <div className="schedule-form__actions">
-        <button type="button" onClick={reset} disabled={isSubmitting}>
+        <button type="button" onClick={() => form.reset(initialValues)} disabled={form.isSubmitting}>
           초기화
         </button>
-        <button type="submit" className="is-primary" disabled={isSubmitting}>
-          {isSubmitting ? '저장 중...' : '일정 저장'}
+        <button type="submit" className="is-primary" disabled={form.isSubmitting}>
+          {form.isSubmitting ? '저장 중...' : submitLabel}
         </button>
       </div>
     </form>

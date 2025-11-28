@@ -1,0 +1,33 @@
+.schedule-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 16px;
+  z-index: 50;
+}
+
+.schedule-modal__content {
+  background-color: #fff;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 24px 24px 0 0;
+  padding: 16px;
+}
+
+.schedule-modal__content header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.schedule-modal__content button {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #2563eb;
+}
+

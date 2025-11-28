@@ -1,3 +1,5 @@
+import { startSchedule, suspendSchedule, completeSchedule, cancelSchedule } from '../api/schedules'
+import { useScheduleCache } from '../context/ScheduleCacheContext'
 import { useEffect, useMemo, useState } from 'react'
 import type { ScheduleState } from '../types/schedule'
 
@@ -20,10 +22,11 @@ type UseScheduleActionsResult = {
   cancel: () => Promise<void>
 }
 
-const useScheduleActions = (initialState: ScheduleState): UseScheduleActionsResult => {
+const useScheduleActions = (scheduleId: number | null, initialState: ScheduleState): UseScheduleActionsResult => {
   const [currentState, setCurrentState] = useState<ScheduleState>(initialState)
   const [isMutating, setIsMutating] = useState(false)
   const [lastMessage, setLastMessage] = useState<string | null>(null)
+  const { updateScheduleState } = useScheduleCache()
 
   useEffect(() => {
     setCurrentState(initialState)
@@ -34,32 +37,37 @@ const useScheduleActions = (initialState: ScheduleState): UseScheduleActionsResu
   const canComplete = useMemo(() => allowedCompleteStates.includes(currentState), [currentState])
   const canCancel = useMemo(() => allowedCancelStates.includes(currentState), [currentState])
 
-  const simulateRequest = async (nextState: ScheduleState, message: string) => {
+  const mutate = async (handler: (id: number) => Promise<void>, nextState: ScheduleState, message: string) => {
+    if (!scheduleId) return
     setIsMutating(true)
-    await new Promise((resolve) => setTimeout(resolve, 150))
-    setCurrentState(nextState)
-    setLastMessage(message)
-    setIsMutating(false)
+    try {
+      await handler(scheduleId)
+      setCurrentState(nextState)
+      updateScheduleState(scheduleId, nextState)
+      setLastMessage(message)
+    } finally {
+      setIsMutating(false)
+    }
   }
 
   const start = async () => {
     if (!canStart || isMutating) return
-    await simulateRequest('IN_PROGRESS', '일정을 시작했습니다.')
+    await mutate(startSchedule, 'IN_PROGRESS', '일정을 시작했습니다.')
   }
 
   const pause = async () => {
     if (!canPause || isMutating) return
-    await simulateRequest('SUSPENDED', '일정을 일시 중지했습니다.')
+    await mutate(suspendSchedule, 'SUSPENDED', '일정을 일시 중지했습니다.')
   }
 
   const complete = async () => {
     if (!canComplete || isMutating) return
-    await simulateRequest('COMPLETED', '일정을 완료했습니다.')
+    await mutate(completeSchedule, 'COMPLETED', '일정을 완료했습니다.')
   }
 
   const cancel = async () => {
     if (!canCancel || isMutating) return
-    await simulateRequest('CANCELED', '일정을 취소했습니다.')
+    await mutate(cancelSchedule, 'CANCELED', '일정을 취소했습니다.')
   }
 
   return {
@@ -78,4 +86,3 @@ const useScheduleActions = (initialState: ScheduleState): UseScheduleActionsResu
 }
 
 export default useScheduleActions
-

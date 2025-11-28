@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
+import { useContext } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ScheduleModalContext } from '../components/layout/AppShell'
 import useScheduleDetail from '../hooks/useScheduleDetail'
 import useScheduleActions from '../hooks/useScheduleActions'
 import './ScheduleDetailPage.css'
@@ -8,7 +10,8 @@ const ScheduleDetailPage = () => {
   const { scheduleId } = useParams()
   const navigate = useNavigate()
   const { schedule, isLoading } = useScheduleDetail(scheduleId)
-  const scheduleActions = useScheduleActions(schedule?.state ?? 'PENDING')
+  const scheduleActions = useScheduleActions(schedule?.id ?? null, schedule?.state ?? 'PENDING')
+  const modal = useContext(ScheduleModalContext)
 
   if (isLoading || !schedule) {
     return <p className="schedule-detail__loading">일정 정보를 불러오는 중...</p>
@@ -56,6 +59,9 @@ const ScheduleDetailPage = () => {
         </button>
         <button type="button" disabled={!scheduleActions.canCancel || scheduleActions.isMutating} onClick={scheduleActions.cancel}>
           취소
+        </button>
+        <button type="button" onClick={() => schedule && modal?.openEdit(schedule.id)}>
+          수정
         </button>
       </footer>
       {scheduleActions.lastMessage && <p className="schedule-detail__message">{scheduleActions.lastMessage}</p>}

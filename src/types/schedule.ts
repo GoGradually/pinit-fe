@@ -43,7 +43,6 @@ export type ScheduleRequest = {
 }
 
 export type ScheduleFormValues = {
-  id?: number
   title: string
   description: string
   date: Date
@@ -75,4 +74,3 @@ export type OverdueSummary = {
   count?: number
   earliestDate?: string
 }
-

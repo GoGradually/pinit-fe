@@ -3,6 +3,7 @@ import type dayjs from 'dayjs'
 import type { ScheduleSummary } from '../types/schedule'
 import { toDateKey } from '../utils/datetime'
 import { fetchScheduleSummaries } from '../api/schedules'
+import { useScheduleCache } from '../context/ScheduleCacheContext'
 
 type UseScheduleListReturn = {
   schedules: ScheduleSummary[]
@@ -12,6 +13,7 @@ type UseScheduleListReturn = {
 }
 
 const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
+  const { getDateSchedules, setDateSchedules } = useScheduleCache()
   const [schedules, setSchedules] = useState<ScheduleSummary[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,10 +27,17 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
     const fetchList = async () => {
       setIsLoading(true)
       setError(null)
+      const cached = getDateSchedules(dateKey)
+      if (cached) {
+        setSchedules(cached)
+        setIsLoading(false)
+        return
+      }
       try {
         const response = await fetchScheduleSummaries(dateKey)
         if (isMounted) {
           setSchedules(response)
+          setDateSchedules(dateKey, response)
         }
       } catch (err) {
         if (isMounted) {

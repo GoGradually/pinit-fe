@@ -1,21 +1,28 @@
 import { useState } from 'react'
 import dayjs from 'dayjs'
 import type { ScheduleFormValues } from '../types/schedule'
-import { toApiDateTimeKST } from '../utils/datetime'
 
-const defaultDate = dayjs().tz().minute(0).second(0)
+const buildDefaultDate = () => dayjs().tz().minute(0).second(0)
 
-const initialFormValues: ScheduleFormValues = {
-  title: '',
-  description: '',
-  date: defaultDate.toDate(),
-  deadline: defaultDate.add(2, 'hour').toDate(),
-  importance: 5,
-  urgency: 5,
-  taskType: 'DEEP_WORK',
-  estimatedMinutes: 60,
-  previousTaskIds: [],
-  nextTaskIds: [],
+const createInitialValues = (overrides?: Partial<ScheduleFormValues>): ScheduleFormValues => {
+  const base = buildDefaultDate()
+  const defaultValues: ScheduleFormValues = {
+    title: '',
+    description: '',
+    date: base.toDate(),
+    deadline: base.add(2, 'hour').toDate(),
+    importance: 5,
+    urgency: 5,
+    taskType: 'DEEP_WORK',
+    estimatedMinutes: 60,
+    previousTaskIds: [],
+    nextTaskIds: [],
+  }
+  return { ...defaultValues, ...overrides }
+}
+
+type UseScheduleFormOptions = {
+  initialValues?: Partial<ScheduleFormValues>
 }
 
 type UseScheduleFormReturn = {
@@ -23,12 +30,13 @@ type UseScheduleFormReturn = {
   errors: Partial<Record<keyof ScheduleFormValues, string>>
   isSubmitting: boolean
   onChange: <K extends keyof ScheduleFormValues>(key: K, value: ScheduleFormValues[K]) => void
-  onSubmit: () => Promise<void>
-  reset: () => void
+  validate: () => boolean
+  setSubmitting: (value: boolean) => void
+  reset: (nextValues?: Partial<ScheduleFormValues>) => void
 }
 
-const useScheduleForm = (): UseScheduleFormReturn => {
-  const [values, setValues] = useState<ScheduleFormValues>(initialFormValues)
+const useScheduleForm = ({ initialValues }: UseScheduleFormOptions = {}): UseScheduleFormReturn => {
+  const [values, setValues] = useState<ScheduleFormValues>(() => createInitialValues(initialValues))
   const [errors, setErrors] = useState<Partial<Record<keyof ScheduleFormValues, string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -53,25 +61,8 @@ const useScheduleForm = (): UseScheduleFormReturn => {
     setValues((prev) => ({ ...prev, [key]: value }))
   }
 
-  const onSubmit = async () => {
-    if (!validate()) return
-    setIsSubmitting(true)
-    try {
-      const payload = {
-        ...values,
-        date: toApiDateTimeKST(values.date),
-        deadline: toApiDateTimeKST(values.deadline),
-      }
-      await new Promise((resolve) => setTimeout(resolve, 200))
-      console.info('Schedule payload', payload)
-      setValues(initialFormValues)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
-  const reset = () => {
-    setValues(initialFormValues)
+  const reset = (nextValues?: Partial<ScheduleFormValues>) => {
+    setValues(createInitialValues(nextValues))
     setErrors({})
   }
 
@@ -80,7 +71,8 @@ const useScheduleForm = (): UseScheduleFormReturn => {
     errors,
     isSubmitting,
     onChange,
-    onSubmit,
+    validate,
+    setSubmitting: setIsSubmitting,
     reset,
   }
 }
