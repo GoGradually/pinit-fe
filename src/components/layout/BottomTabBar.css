@@ -1,0 +1,30 @@
+.bottom-tab {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-around;
+  background-color: #fff;
+  border-top: 1px solid #e2e8f0;
+  padding: 8px 0;
+}
+
+.bottom-tab__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.bottom-tab__icon {
+  font-size: 18px;
+}
+
+.bottom-tab__item.is-active {
+  color: #2563eb;
+}
+

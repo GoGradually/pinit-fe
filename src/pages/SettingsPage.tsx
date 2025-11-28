@@ -1,0 +1,83 @@
+import { useState } from 'react'
+import './SettingsPage.css'
+
+const SettingsPage = () => {
+  const [isNotificationEnabled, setIsNotificationEnabled] = useState(true)
+  const [isDeadlineReminderEnabled, setIsDeadlineReminderEnabled] = useState(false)
+  const [isAutoStatsEnabled, setIsAutoStatsEnabled] = useState(true)
+
+  return (
+    <section className="settings">
+      <header className="settings__header">
+        <p className="settings__subheading">앱 기본값</p>
+        <h1 className="settings__title">알림 및 기준 정보</h1>
+      </header>
+
+      <section className="settings__card" aria-label="알림 설정">
+        <h2>알림 설정</h2>
+        <div className="settings__row">
+          <div>
+            <p className="settings__label">앱 알림</p>
+            <p className="settings__description">일정 시작/종료/마감 알림을 받아요.</p>
+          </div>
+          <button
+            className={['settings__toggle', isNotificationEnabled && 'is-active'].filter(Boolean).join(' ')}
+            onClick={() => setIsNotificationEnabled((prev) => !prev)}
+            aria-pressed={isNotificationEnabled}
+          >
+            <span />
+          </button>
+        </div>
+        <div className="settings__row">
+          <div>
+            <p className="settings__label">마감 30분 전 알림</p>
+            <p className="settings__description">긴급도가 높은 일정에 우선 적용됩니다.</p>
+          </div>
+          <button
+            className={['settings__toggle', isDeadlineReminderEnabled && 'is-active'].filter(Boolean).join(' ')}
+            onClick={() => setIsDeadlineReminderEnabled((prev) => !prev)}
+            aria-pressed={isDeadlineReminderEnabled}
+          >
+            <span />
+          </button>
+        </div>
+      </section>
+
+      <section className="settings__card" aria-label="시간 및 통계 기준">
+        <h2>시간 & 통계 기준</h2>
+        <ul className="settings__list">
+          <li>
+            <p className="settings__label">표시 타임존</p>
+            <p className="settings__value">Asia/Seoul (UTC+9)</p>
+          </li>
+          <li>
+            <p className="settings__label">주간 기준</p>
+            <p className="settings__value">월요일 시작 · 7일 고정</p>
+          </li>
+          <li>
+            <p className="settings__label">통계 자동 업데이트</p>
+            <div className="settings__row settings__row--tight">
+              <p className="settings__description">매일 00:00 기준 자동 계산</p>
+              <button
+                className={['settings__toggle', isAutoStatsEnabled && 'is-active'].filter(Boolean).join(' ')}
+                onClick={() => setIsAutoStatsEnabled((prev) => !prev)}
+                aria-pressed={isAutoStatsEnabled}
+              >
+                <span />
+              </button>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section className="settings__card" aria-label="향후 추가 예정">
+        <h2>향후 추가 예정</h2>
+        <p className="settings__description">
+          작업 타입 라벨, 알림 방식 지정, GPT 추천 설정 등은 추후 이 영역에 확장됩니다.
+        </p>
+      </section>
+    </section>
+  )
+}
+
+export default SettingsPage

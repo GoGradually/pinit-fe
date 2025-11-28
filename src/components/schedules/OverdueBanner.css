@@ -1,0 +1,18 @@
+.overdue-banner {
+  width: 100%;
+  border: none;
+  background-color: #fef3c7;
+  color: #78350f;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.overdue-banner__icon {
+  font-size: 18px;
+}
+

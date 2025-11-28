@@ -1,0 +1,31 @@
+.schedules-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.schedules-tab__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.schedules-tab__header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.schedules-tab__refresh {
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.schedules-tab__list {
+  min-height: 200px;
+  border-radius: 16px;
+  background-color: #fff;
+  padding: 16px;
+}
+
