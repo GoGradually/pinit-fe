@@ -1,0 +1,26 @@
+.statistics-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.statistics-tab__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statistics-tab__header button {
+  align-self: flex-start;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+  background-color: #e2e8f0;
+}
+
+.statistics-tab__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+

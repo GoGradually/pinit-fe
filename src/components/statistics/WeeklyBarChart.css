@@ -1,0 +1,38 @@
+.weekly-bar {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+.weekly-bar__bar {
+  display: flex;
+  gap: 4px;
+  height: 24px;
+  background-color: #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.weekly-bar__segment {
+  display: block;
+  height: 100%;
+}
+
+.weekly-bar__segment--deep {
+  background-color: #2563eb;
+}
+
+.weekly-bar__segment--admin {
+  background-color: #f97316;
+}
+
+.weekly-bar__legend {
+  font-size: 14px;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
