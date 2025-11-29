@@ -10,7 +10,7 @@ import ScheduleItemActions from '../components/schedules/ScheduleItemActions'
 import useScheduleList from '../hooks/useScheduleList'
 import StatusPanel from '../components/common/StatusPanel'
 import ScheduleDetailModal from '../components/modals/ScheduleDetailModal'
-import { deleteSchedule } from '../api/schedules'
+import { deleteSchedule, startSchedule, cancelSchedule } from '../api/schedules'
 import './SchedulesTabPage.css'
 
 const SchedulesTabPage = () => {
@@ -66,6 +66,32 @@ const SchedulesTabPage = () => {
     }
   }
 
+  const handleStart = async (scheduleId: number) => {
+    console.log(`▶️ Start schedule ${scheduleId}`)
+    try {
+      await startSchedule(scheduleId)
+      console.log(`✅ Schedule started: ${scheduleId}`)
+      refetchSchedules()
+      refetchPresence()
+    } catch (error) {
+      console.error(`❌ Start failed for schedule ${scheduleId}:`, error)
+      alert('일정 시작에 실패했습니다.')
+    }
+  }
+
+  const handleCancel = async (scheduleId: number) => {
+    console.log(`✕ Cancel schedule ${scheduleId}`)
+    try {
+      await cancelSchedule(scheduleId)
+      console.log(`✅ Schedule cancelled: ${scheduleId}`)
+      refetchSchedules()
+      refetchPresence()
+    } catch (error) {
+      console.error(`❌ Cancel failed for schedule ${scheduleId}:`, error)
+      alert('일정 취소에 실패했습니다.')
+    }
+  }
+
   return (
     <section className="schedules-tab">
       {isOverdueLoading ? (
@@ -109,6 +135,8 @@ const SchedulesTabPage = () => {
                 schedule={schedule}
                 onOpenDetail={setDetailScheduleId}
                 onDelete={handleDelete}
+                onStart={handleStart}
+                onCancel={handleCancel}
               />
               <ScheduleItemActions
                 schedule={schedule}

@@ -1,12 +1,19 @@
 import useActiveSchedule from '../../hooks/useActiveSchedule'
 import useScheduleActions from '../../hooks/useScheduleActions'
+import type { ScheduleState } from '../../types/schedule'
 import './MiniPlayerBar.css'
 
 const MiniPlayerBar = () => {
   const activeSchedule = useActiveSchedule()
-  const scheduleActions = useScheduleActions(activeSchedule?.id ?? null, activeSchedule?.state ?? 'NOT_STARTED')
+  const scheduleActions = useScheduleActions(
+    activeSchedule?.id ?? null,
+    (activeSchedule?.state ?? 'NOT_STARTED') as ScheduleState
+  )
 
-  if (!activeSchedule) return null
+  // IN_PROGRESS 또는 SUSPENDED 상태일 때만 표시
+  if (!activeSchedule || (activeSchedule.state !== 'IN_PROGRESS' && activeSchedule.state !== 'SUSPENDED')) {
+    return null
+  }
 
   return (
     <div className="mini-player-wrapper">
