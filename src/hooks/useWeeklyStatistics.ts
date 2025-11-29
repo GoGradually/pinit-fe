@@ -1,9 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import type dayjs from 'dayjs'
 
 import { fetchWeeklyStatistics } from '../api/statistics'
 import { toWeeklyStatisticsView } from '../utils/statisticsTransform'
 import { getTodayKST } from '../utils/datetime'
 import type { WeeklyStatisticsView } from '../types/statistics'
+import { MEMBER_ID } from '../constants/member'
+
+type Options = {
+  weekStart?: dayjs.Dayjs
+  memberId?: number
+}
 
 type UseWeeklyStatisticsReturn = {
   stats: WeeklyStatisticsView | null
@@ -12,11 +19,13 @@ type UseWeeklyStatisticsReturn = {
   refetch: () => void
 }
 
-const useWeeklyStatistics = (): UseWeeklyStatisticsReturn => {
+const useWeeklyStatistics = (options: Options = {}): UseWeeklyStatisticsReturn => {
   const [stats, setStats] = useState<WeeklyStatisticsView | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [timestamp, setTimestamp] = useState(() => Date.now())
   const [error, setError] = useState<string | null>(null)
+  const { weekStart, memberId = MEMBER_ID } = options
+  const timeParam = useMemo(() => (weekStart ?? getTodayKST()).toISOString(), [weekStart])
 
   useEffect(() => {
     let isMounted = true
@@ -27,15 +36,9 @@ const useWeeklyStatistics = (): UseWeeklyStatisticsReturn => {
       console.log('📊 Fetching weekly statistics...')
 
       try {
-        const todayKST = getTodayKST()
-        const timeParam = todayKST.toISOString()
+        console.log('📊 Request params:', { memberId, time: timeParam })
 
-        console.log('📊 Request params:', { memberId: 1, time: timeParam })
-
-        const response = await fetchWeeklyStatistics({
-          memberId: 1,
-          time: timeParam,
-        })
+        const response = await fetchWeeklyStatistics({ memberId, time: timeParam })
 
         console.log('📊 API Response:', response)
 
@@ -55,7 +58,7 @@ const useWeeklyStatistics = (): UseWeeklyStatisticsReturn => {
     return () => {
       isMounted = false
     }
-  }, [timestamp])
+  }, [timestamp, memberId, timeParam])
 
   return {
     stats,

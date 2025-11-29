@@ -11,6 +11,8 @@ import useScheduleList from '../hooks/useScheduleList'
 import StatusPanel from '../components/common/StatusPanel'
 import ScheduleDetailModal from '../components/modals/ScheduleDetailModal'
 import { deleteSchedule, startSchedule, cancelSchedule } from '../api/schedules'
+import useWeeklyStatistics from '../hooks/useWeeklyStatistics'
+import { formatMinutesToTime } from '../utils/statisticsTransform'
 import './SchedulesTabPage.css'
 
 const SchedulesTabPage = () => {
@@ -21,6 +23,13 @@ const SchedulesTabPage = () => {
     useWeeklySchedulePresence({ weekStart: currentWeekStart })
   const { summary: overdueSummary, isLoading: isOverdueLoading, refetch: refetchOverdue } =
     useOverdueSchedulesSummary()
+  const {
+    stats: weeklyStats,
+    isLoading: isWeeklyStatsLoading,
+    error: weeklyStatsError,
+    refetch: refetchWeeklyStats,
+  } = useWeeklyStatistics({ weekStart: currentWeekStart.add(1, 'day') })
+
   const { schedules, isLoading: isScheduleLoading, error: scheduleError, refetch: refetchSchedules } =
     useScheduleList(selectedDate)
 
@@ -32,7 +41,10 @@ const SchedulesTabPage = () => {
     isScheduleLoading,
     schedulesCount: schedules.length,
     scheduleError,
-    schedules: schedules.map(s => ({ id: s.id, title: s.title, state: s.state }))
+    schedules: schedules.map(s => ({ id: s.id, title: s.title, state: s.state })),
+    isWeeklyStatsLoading,
+    weeklyStatsError,
+    weeklyTotalMinutes: weeklyStats?.totalMinutes,
   })
 
   const handleRefresh = () => {
@@ -40,6 +52,7 @@ const SchedulesTabPage = () => {
     refetchPresence()
     refetchOverdue()
     refetchSchedules()
+    refetchWeeklyStats()
   }
 
   const handleActionClick = async (scheduleId: number, action: () => Promise<void>) => {
@@ -112,6 +125,17 @@ const SchedulesTabPage = () => {
         onSelectDate={selectDate}
         onChangeWeek={goToWeek}
       />
+      <div className="schedules-tab__weekly-stats">
+        {isWeeklyStatsLoading ? (
+          <span>이번 주 총 작업 시간을 불러오는 중...</span>
+        ) : weeklyStatsError ? (
+          <span>총 작업 시간을 표시할 수 없어요</span>
+        ) : weeklyStats ? (
+          <span>이번 주 총 작업 {formatMinutesToTime(weeklyStats.totalMinutes)}</span>
+        ) : (
+          <span>이번 주 총 작업 0시간 0분</span>
+        )}
+      </div>
       <header className="schedules-tab__header">
         <h2>{selectedDateLabel}</h2>
         <button type="button" className="schedules-tab__refresh" onClick={handleRefresh}>

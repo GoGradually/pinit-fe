@@ -12,24 +12,45 @@ const parseElapsedTime = (durationString: string): number => {
     return 0
   }
 
-  try {
-    // ISO 8601 Duration 형식 파싱 (예: "PT12H55M53S")
-    const dur = dayjs.duration(durationString)
-    const totalMinutes = Math.floor(dur.asMinutes())
+  const trimmed = durationString.trim()
 
-    console.log('✅ Parsed duration:', {
-      durationString,
-      hours: dur.hours(),
-      minutes: dur.minutes(),
-      seconds: dur.seconds(),
-      totalMinutes
-    })
-
-    return totalMinutes
-  } catch (error) {
-    console.error('❌ Failed to parse duration:', { durationString, error })
-    return 0
+  // 1) ISO-8601 Duration (PT12H34M56S)
+  if (trimmed.startsWith('P')) {
+    try {
+      const isoDuration = dayjs.duration(trimmed)
+      const totalMinutes = Math.floor(isoDuration.asMinutes())
+      console.log('✅ Parsed ISO duration:', {
+        durationString,
+        hours: isoDuration.hours(),
+        minutes: isoDuration.minutes(),
+        seconds: isoDuration.seconds(),
+        totalMinutes,
+      })
+      return totalMinutes
+    } catch (error) {
+      console.error('❌ Failed to parse ISO duration:', { durationString, error })
+    }
   }
+
+  // 2) HH:mm:ss 또는 HH:mm:ss.SSS 포맷
+  const hmsMatch = trimmed.match(/^(\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?$/)
+  if (hmsMatch) {
+    const [, hours = '0', minutes = '0', seconds = '0'] = hmsMatch
+    const totalMinutes = Math.floor(
+      Number(hours) * 60 + Number(minutes) + Number(seconds) / 60,
+    )
+    console.log('✅ Parsed HH:mm:ss duration:', {
+      durationString,
+      hours,
+      minutes,
+      seconds,
+      totalMinutes,
+    })
+    return totalMinutes
+  }
+
+  console.warn('⚠️ Unsupported duration format, defaulting to 0:', durationString)
+  return 0
 }
 
 export const toWeeklyStatisticsView = (payload: StatisticsResponse): WeeklyStatisticsView => {
@@ -53,4 +74,24 @@ export const toWeeklyStatisticsView = (payload: StatisticsResponse): WeeklyStati
   console.log('✅ Transformation complete:', result)
 
   return result
+}
+
+export const formatMinutesToTime = (totalMinutes: number): string => {
+  const safeMinutes = Math.max(0, Math.floor(totalMinutes || 0))
+  const hours = Math.floor(safeMinutes / 60)
+  const minutes = safeMinutes % 60
+
+  if (hours === 0 && minutes === 0) {
+    return '0시간 0분'
+  }
+
+  if (hours === 0) {
+    return `${minutes}분`
+  }
+
+  if (minutes === 0) {
+    return `${hours}시간`
+  }
+
+  return `${hours}시간 ${minutes}분`
 }

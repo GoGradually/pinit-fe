@@ -914,6 +914,40 @@
           }
         }
       }
+    },
+    "/now": {
+      "get": {
+        "tags": [
+          "member-controller"
+        ],
+        "summary": "현재 진행 중인 일정 ID 조회",
+        "description": "사용자의 현재 진행 중인 일정 ID를 조회합니다.",
+        "operationId": "getNowInProgressScheduleId",
+        "parameters": [
+          {
+            "name": "memberId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

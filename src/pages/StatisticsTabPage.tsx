@@ -4,21 +4,7 @@ import DonutChart from '../components/statistics/DonutChart'
 import WeeklyBarChart from '../components/statistics/WeeklyBarChart'
 import StatusPanel from '../components/common/StatusPanel'
 import './StatisticsTabPage.css'
-
-const formatMinutesToTime = (totalMinutes: number): string => {
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
-
-  if (hours === 0) {
-    return `${minutes}분`
-  }
-
-  if (minutes === 0) {
-    return `${hours}시간`
-  }
-
-  return `${hours}시간 ${minutes}분`
-}
+import { formatMinutesToTime } from '../utils/statisticsTransform'
 
 const StatisticsTabPage = () => {
   const { stats, isLoading, error, refetch } = useWeeklyStatistics()
