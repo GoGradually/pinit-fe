@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { ReactNode } from 'react'
 import type { ScheduleResponse, ScheduleState, ScheduleSummary } from '../types/schedule'
 import { toDateKey } from '../utils/datetime'
+import { areScheduleListsEqual } from '../utils/scheduleList'
 
 export type ScheduleCacheValue = {
   schedulesByDate: Record<string, ScheduleSummary[]>
@@ -33,7 +34,13 @@ export const ScheduleCacheProvider = ({ children }: { children: ReactNode }) => 
   ])
 
   const setDateSchedules = useCallback((dateKey: string, schedules: ScheduleSummary[]) => {
-    setSchedulesByDate((prev) => ({ ...prev, [dateKey]: schedules }))
+    setSchedulesByDate((prev) => {
+      const current = prev[dateKey]
+      if (areScheduleListsEqual(current, schedules)) {
+        return prev
+      }
+      return { ...prev, [dateKey]: schedules }
+    })
   }, [])
 
   const updateScheduleState = useCallback((scheduleId: number, nextState: ScheduleState) => {
@@ -76,7 +83,7 @@ export const ScheduleCacheProvider = ({ children }: { children: ReactNode }) => 
       } else {
         nextList.push(summary)
       }
-      return { ...prev, [dateKey]: nextList }
+      return areScheduleListsEqual(current, nextList) ? prev : { ...prev, [dateKey]: nextList }
     })
   }, [])
 

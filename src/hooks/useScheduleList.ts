@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import type dayjs from 'dayjs'
 import type { ScheduleSummary } from '../types/schedule'
 import { toDateKey } from '../utils/datetime'
 import { fetchScheduleSummaries } from '../api/schedules'
 import { useScheduleCache } from '../context/ScheduleCacheContext'
+import { areScheduleListsEqual } from '../utils/scheduleList'
 
 type UseScheduleListReturn = {
   schedules: ScheduleSummary[]
@@ -18,69 +19,50 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [timestamp, setTimestamp] = useState(() => Date.now())
+  const lastAppliedRef = useRef<ScheduleSummary[]>([])
 
   const dateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
 
+  const applySchedules = useCallback((next: ScheduleSummary[]) => {
+    lastAppliedRef.current = next
+    setSchedules(next)
+  }, [])
+
   // 캐시 변경 감지하여 자동 업데이트
   useEffect(() => {
-    const cached = getDateSchedules(dateKey)
-    if (cached && cached.length > 0) {
-      console.log('📦 Cache updated, syncing schedules:', { dateKey, count: cached.length })
-      setSchedules(cached)
+    const cached = schedulesByDate[dateKey]
+    if (cached && !areScheduleListsEqual(cached, lastAppliedRef.current)) {
+      applySchedules(cached)
+      setIsLoading(false)
     }
-  }, [schedulesByDate, dateKey, getDateSchedules])
+  }, [applySchedules, dateKey, schedulesByDate])
 
   useEffect(() => {
-    let isMounted = true
+    let isCancelled = false
 
     const fetchList = async () => {
       setIsLoading(true)
       setError(null)
 
-      console.log('🔄 useScheduleList: Starting fetch', { dateKey, timestamp })
-
-      // 캐시 사용 활성화
-      const USE_CACHE = true
-
-      if (USE_CACHE) {
-        const cached = getDateSchedules(dateKey)
-        if (cached) {
-          console.log('📦 Cache HIT:', {
-            dateKey,
-            count: cached.length,
-            items: cached.map(s => ({ id: s.id, title: s.title, state: s.state }))
-          })
-          setSchedules(cached)
-          setIsLoading(false)
-          return
-        }
+      const cached = getDateSchedules(dateKey)
+      if (cached) {
+        applySchedules(cached)
+        setIsLoading(false)
+        return
       }
-
-      console.log('🌐 Cache MISS, calling API:', dateKey)
 
       try {
         const response = await fetchScheduleSummaries(dateKey)
-        console.log('✅ API Response received:', {
-          dateKey,
-          count: response.length,
-          items: response.map(s => ({ id: s.id, title: s.title, state: s.state }))
-        })
-
-        if (isMounted) {
-          setSchedules(response)
-          setDateSchedules(dateKey, response)
-          console.log('💾 Data saved to state and cache')
-        }
+        if (isCancelled) return
+        applySchedules(response)
+        setDateSchedules(dateKey, response)
       } catch (error) {
-        console.error('❌ Fetch error:', { dateKey, error })
-        if (isMounted) {
-          const message = error instanceof Error ? error.message : '일정을 불러오지 못했습니다.'
-          setError(message)
-        }
+        if (isCancelled) return
+        const message = error instanceof Error ? error.message : '일정을 불러오지 못했습니다.'
+        setError(message)
       } finally {
-        if (isMounted) {
+        if (!isCancelled) {
           setIsLoading(false)
-          console.log('✅ useScheduleList: Fetch complete', { dateKey })
         }
       }
     }
@@ -88,10 +70,10 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
     fetchList()
 
     return () => {
-      isMounted = false
+      isCancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateKey, timestamp])
+  }, [dateKey, timestamp, applySchedules])
 
   return {
     schedules,
