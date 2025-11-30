@@ -1,6 +1,4 @@
-import { NavLink } from 'react-router-dom'
-import { useContext } from 'react'
-import { ScheduleModalContext } from '../../context/ScheduleModalContext'
+import { NavLink, useNavigate } from 'react-router-dom'
 import './BottomTabBar.css'
 
 type BottomTabBarProps = {
@@ -12,8 +10,13 @@ const tabs = [
   { key: 'statistics', label: '통계', path: '/app/statistics', icon: '📊' },
 ]
 
+/**
+ * 하단 네비게이션 바 컴포넌트
+ * @param activePath - 현재 활성화된 경로
+ * @constructor
+ */
 const BottomTabBar = ({ activePath }: BottomTabBarProps) => {
-  const modal = useContext(ScheduleModalContext)
+  const navigate = useNavigate()
 
   const getActiveTab = (path: string) => {
     if (path.startsWith('/app/schedules')) return '/app/schedules'
@@ -24,7 +27,7 @@ const BottomTabBar = ({ activePath }: BottomTabBarProps) => {
   const activeTab = getActiveTab(activePath)
 
   const handleAddClick = () => {
-    modal?.openCreate()
+    navigate('/app/new')
   }
 
   return (

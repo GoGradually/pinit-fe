@@ -1,8 +1,7 @@
 import dayjs from 'dayjs'
-import { useContext } from 'react'
-import { ScheduleModalContext } from '../../context/ScheduleModalContext'
 import useScheduleDetail from '../../hooks/useScheduleDetail'
 import { deleteSchedule } from '../../api/schedules'
+import { useNavigate } from 'react-router-dom'
 import './ScheduleDetailModal.css'
 
 type ScheduleDetailModalProps = {
@@ -11,9 +10,16 @@ type ScheduleDetailModalProps = {
   onRefresh?: () => void
 }
 
+/**
+ * 일정 상세 모달 컴포넌트
+ * @param scheduleId - 일정 ID
+ * @param onClose - 모달 닫기 콜백
+ * @param onRefresh - 일정 목록 새로고침 콜백 (선택적)
+ * @constructor
+ */
 const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailModalProps) => {
   const { schedule, isLoading } = useScheduleDetail(scheduleId.toString())
-  const modal = useContext(ScheduleModalContext)
+  const navigate = useNavigate()
 
   const handleDelete = async () => {
     if (!schedule) return
@@ -88,12 +94,12 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
           <footer className="schedule-detail-modal__actions">
             <button
               type="button"
-              onClick={() => {
-                onClose()
-                if (schedule) {
-                  modal?.openEdit(schedule.id)
-                }
-              }}
+            onClick={() => {
+              onClose()
+              if (schedule) {
+                navigate(`/app/schedules/${schedule.id}/edit`)
+              }
+            }}
               className="schedule-detail-modal__action-btn schedule-detail-modal__action-btn--edit"
             >
               ✏️ 수정
@@ -113,4 +119,3 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
 }
 
 export default ScheduleDetailModal
-

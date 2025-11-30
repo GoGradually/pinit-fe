@@ -6,6 +6,12 @@ type OverdueBannerProps = {
   onNavigateToDate: (dateKey: string) => void
 }
 
+/**
+ * 미완료 일정 배너 컴포넌트
+ * @param summary - 미완료 일정 요약 정보
+ * @param onNavigateToDate - 날짜로 이동 핸들러
+ * @constructor
+ */
 const OverdueBanner = ({ summary, onNavigateToDate }: OverdueBannerProps) => {
   if (!summary.hasOverdue) return null
 

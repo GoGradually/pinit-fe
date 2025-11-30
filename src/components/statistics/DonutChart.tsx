@@ -6,6 +6,12 @@ type DonutChartProps = {
   adminWorkRatio: number
 }
 
+/**
+ * 도넛 차트 컴포넌트
+ * @param deepWorkRatio - 집중 작업 비율
+ * @param adminWorkRatio - 행정 작업 비율
+ * @constructor
+ */
 const DonutChart = ({ deepWorkRatio, adminWorkRatio }: DonutChartProps) => {
   const deepPercentage = Math.round(deepWorkRatio * 100)
   const adminPercentage = Math.round(adminWorkRatio * 100)

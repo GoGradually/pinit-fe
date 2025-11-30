@@ -2,10 +2,6 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import TopBar from './TopBar'
 import BottomTabBar from './BottomTabBar'
 import MiniPlayerBar from '../schedules/MiniPlayerBar'
-import useScheduleModal from '../../hooks/useScheduleModal'
-import useScheduleDetail from '../../hooks/useScheduleDetail'
-import ScheduleModal from '../modals/ScheduleModal'
-import { ScheduleModalContext } from '../../context/ScheduleModalContext'
 import './AppShell.css'
 
 const TAB_TITLES: Record<string, string> = {
@@ -16,12 +12,25 @@ const TAB_TITLES: Record<string, string> = {
 }
 
 const getPageTitle = (pathname: string): string => {
+  if (pathname.includes('/edit')) {
+    return '일정 수정'
+  }
   if (pathname.startsWith('/app/schedules/')) {
     return '일정 상세'
   }
   return TAB_TITLES[pathname] ?? '일정'
 }
 
+/**
+ * 앱의 골격(껍데기) 컴포넌트
+ * 다음과 같은 것들을 포함한다.
+ * - 항상 고정으로 나오는 부분
+ *   - 상단 바(TopBar)
+ *   - 사이드바 / 탭 바 / 하단 네비게이션
+ *   - 전역 모달, 토스트, 공통 컨텍스트(provider) 등
+ * - 라우터에 따라 바뀌는 내용이 들어갈 자리
+ * @constructor
+ */
 const AppShell = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -32,34 +41,22 @@ const AppShell = () => {
   const isDetailPage = pathname.startsWith('/app/schedules/') && pathname.split('/').length > 3
   const showBackButton = isDetailPage || pathname === '/app/settings'
 
-  const modalControls = useScheduleModal()
-  const editScheduleId = modalControls.editScheduleId
-  const editScheduleResult = useScheduleDetail(editScheduleId ? editScheduleId.toString() : undefined)
-  const editSchedule = editScheduleResult.schedule
-
   return (
-    <ScheduleModalContext.Provider value={modalControls}>
-      <div className="app-shell">
-        <TopBar
-          title={title}
-          showBackButton={showBackButton}
-          onBack={() => navigate(-1)}
-          onSettings={() => navigate('/app/settings')}
-          showSettingsButton={showSettingsButton}
-        />
-        <main className="app-shell__content">
-          <Outlet />
-        </main>
-        <MiniPlayerBar />
-        <BottomTabBar activePath={pathname} />
-        {modalControls.isCreateOpen && (
-          <ScheduleModal mode="create" onClose={modalControls.closeCreate} />
-        )}
-        {modalControls.editScheduleId && (
-          <ScheduleModal mode="edit" schedule={editSchedule} onClose={modalControls.closeEdit} />
-        )}
-      </div>
-    </ScheduleModalContext.Provider>
+    <div className="app-shell">
+      <TopBar
+        title={title}
+        showBackButton={showBackButton}
+        onBack={() => navigate(-1)}
+        onSettings={() => navigate('/app/settings')}
+        showSettingsButton={showSettingsButton}
+      />
+      {/*  리액트 라우터 호출: app-shell__content */}
+      <main className="app-shell__content">
+        <Outlet />
+      </main>
+      <MiniPlayerBar />
+      <BottomTabBar activePath={pathname} />
+    </div>
   )
 }
 

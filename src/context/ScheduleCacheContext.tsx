@@ -14,8 +14,15 @@ export type ScheduleCacheValue = {
   activeSchedule?: ScheduleSummary
 }
 
+/**
+ * 일정 캐시 컨텍스트
+ */
 const ScheduleCacheContext = createContext<ScheduleCacheValue | null>(null)
 
+/**
+ * 활성 일정을 도출하는 헬퍼 함수
+ * @param schedulesByDate
+ */
 const deriveActiveSchedule = (schedulesByDate: Record<string, ScheduleSummary[]>) => {
   for (const schedules of Object.values(schedulesByDate)) {
     const active = schedules.find((schedule) =>
@@ -26,9 +33,15 @@ const deriveActiveSchedule = (schedulesByDate: Record<string, ScheduleSummary[]>
   return undefined
 }
 
+/**
+ * 일정 캐시 프로바이더 컴포넌트
+ * @param children - 하위 컴포넌트
+ * @constructor
+ */
 export const ScheduleCacheProvider = ({ children }: { children: ReactNode }) => {
   const [schedulesByDate, setSchedulesByDate] = useState<Record<string, ScheduleSummary[]>>({})
 
+    // useCallback의 참조 불변 보장은 애초에 “같은 컴포넌트 인스턴스가 살아 있는 동안”을 전제로 한 보장
   const getDateSchedules = useCallback((dateKey: string) => schedulesByDate[dateKey], [
     schedulesByDate,
   ])

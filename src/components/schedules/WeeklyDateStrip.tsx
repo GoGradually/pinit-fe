@@ -13,7 +13,15 @@ type WeeklyDateStripProps = {
 }
 
 const DRAG_THRESHOLD = 60
-
+/**
+ * 이번 주차의 날짜를 선택하는 컴포넌트
+ * @param weekStart - 주 시작일
+ * @param selectedDate - 현재 선택된 날짜
+ * @param presenceMap - 일정 존재 맵
+ * @param onSelectDate - 날짜 선택 시 동작하는 핸들러
+ * @param onChangeWeek - 주 변경 시 동작하는 핸들러
+ * @constructor
+ */
 const WeeklyDateStrip = ({
   weekStart,
   selectedDate,

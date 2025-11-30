@@ -11,6 +11,13 @@ type ScheduleModalProps = {
   onClose: () => void
 }
 
+/**
+ * 일정 생성/수정 모달 컴포넌트
+ * @param mode - 'create' | 'edit'
+ * @param schedule - 수정 모드일 때 편집할 일정 데이터
+ * @param onClose - 모달 닫기 콜백
+ * @constructor
+ */
 const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
   useEffect(() => {
     return () => {

@@ -20,6 +20,13 @@ const dependencyMockOptions = [
   { id: 103, title: '리뷰 일정' },
 ]
 
+/**
+ * 일정 생성/수정 폼 컴포넌트
+ * @param initialValues - 초기 값
+ * @param onSubmit - 제출 핸들러
+ * @param submitLabel - 제출 버튼 라벨
+ * @constructor
+ */
 const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }: ScheduleFormProps) => {
   const form = useScheduleForm({ initialValues })
 

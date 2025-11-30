@@ -1,7 +1,7 @@
-import { startSchedule, suspendSchedule, completeSchedule, cancelSchedule } from '../api/schedules'
-import { useScheduleCache } from '../context/ScheduleCacheContext'
+import { startSchedule, suspendSchedule, completeSchedule, cancelSchedule } from '../../api/schedules.ts'
+import { useScheduleCache } from '../../context/ScheduleCacheContext.tsx'
 import { useEffect, useMemo, useState } from 'react'
-import type { ScheduleState } from '../types/schedule'
+import type { ScheduleState } from '../../types/schedule.ts'
 
 // 실제 백엔드 상태에 맞게 수정
 // NOT_STARTED: 시작, 완료 가능
@@ -33,6 +33,11 @@ type UseScheduleActionsResult = {
   cancel: () => Promise<void>
 }
 
+/**
+ * 일정 상태 변경 훅
+ * @param scheduleId - 일정 ID
+ * @param initialState - 초기 상태
+ */
 const useScheduleActions = (scheduleId: number | null, initialState: ScheduleState): UseScheduleActionsResult => {
   const [currentState, setCurrentState] = useState<ScheduleState>(initialState)
   const [isMutating, setIsMutating] = useState(false)

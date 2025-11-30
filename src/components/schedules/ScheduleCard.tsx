@@ -29,6 +29,15 @@ const stateIcon: Record<ScheduleSummary['state'], string> = {
   SUSPENDED: '⏸',     // 일시정지
 }
 
+/**
+ * 일정 카드 컴포넌트
+ * @param schedule - 일정 요약 정보
+ * @param onOpenDetail - 상세 보기 핸들러
+ * @param onDelete - 삭제 핸들러
+ * @param onStart - 시작 핸들러
+ * @param onCancel - 취소 핸들러
+ * @constructor
+ */
 const ScheduleCard = ({ schedule, onOpenDetail, onDelete, onStart, onCancel }: ScheduleCardProps) => {
   const { id, title, description, importance, urgency, taskType, state } = schedule
 

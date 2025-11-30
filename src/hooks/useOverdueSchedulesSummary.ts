@@ -4,6 +4,10 @@ import type { OverdueSummary, ScheduleResponse } from '../types/schedule'
 import { fetchWeeklySchedules } from '../api/schedules'
 import { getTodayKST, toDateKey } from '../utils/datetime'
 
+/**
+ * 미완료된 일정 요약 정보를 반환하는 커스텀 훅
+ * @returns 미완료된 일정 요약 정보, 로딩 상태, 재조회 함수
+ */
 const useOverdueSchedulesSummary = () => {
   const [summary, setSummary] = useState<OverdueSummary>({ hasOverdue: false })
   const [isLoading, setIsLoading] = useState(true)

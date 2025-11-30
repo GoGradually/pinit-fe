@@ -8,6 +8,15 @@ type TopBarProps = {
   onSettings?: () => void
 }
 
+/**
+ * 상단 바 컴포넌트
+ * @param title - 제목
+ * @param showBackButton - 뒤로가기 버튼 표시 여부
+ * @param onBack - 뒤로가기 버튼 클릭 핸들러
+ * @param showSettingsButton - 설정 버튼 표시 여부
+ * @param onSettings - 설정 버튼 클릭 핸들러
+ * @constructor
+ */
 const TopBar = ({
   title,
   showBackButton,
@@ -23,7 +32,7 @@ const TopBar = ({
             ←
           </button>
         ) : (
-          <span className="top-bar__placeholder" />
+          <span className="top-bar__placeholder">📌</span>
         )}
       </div>
       <div className="top-bar__title" aria-live="polite">

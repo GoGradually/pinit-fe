@@ -1,4 +1,4 @@
-import useScheduleActions from '../../hooks/useScheduleActions'
+import useScheduleActions from '../../hooks/scheduledetails/useScheduleActions.ts'
 import type { ScheduleSummary } from '../../types/schedule'
 
 type ScheduleItemActionsProps = {
@@ -6,6 +6,12 @@ type ScheduleItemActionsProps = {
   onActionClick: (scheduleId: number, action: () => Promise<void>) => void
 }
 
+/**
+ * 일정 아이템의 상태 변경 액션 버튼 컴포넌트
+ * @param schedule - 일정 요약 정보
+ * @param onActionClick - 액션 클릭 핸들러
+ * @constructor
+ */
 const ScheduleItemActions = ({ schedule, onActionClick }: ScheduleItemActionsProps) => {
   const actions = useScheduleActions(schedule.id, schedule.state)
 

@@ -21,6 +21,13 @@ const formatMinutesToTime = (totalMinutes: number): string => {
   return `${hours}시간 ${minutes}분`
 }
 
+/**
+ * 주간 작업 시간을 막대 그래프로 나타내는 컴포넌트
+ * @param deepWorkMinutes - 집중 작업 시간 (분)
+ * @param adminWorkMinutes - 행정 작업 시간 (분)
+ * @param totalMinutes - 총 작업 시간 (분)
+ * @constructor
+ */
 const WeeklyBarChart = ({ deepWorkMinutes, adminWorkMinutes, totalMinutes }: WeeklyBarChartProps) => {
   const deepRatio = totalMinutes ? deepWorkMinutes / totalMinutes : 0
   const adminRatio = totalMinutes ? adminWorkMinutes / totalMinutes : 0

@@ -1,8 +1,10 @@
-import useActiveSchedule from '../../hooks/useActiveSchedule'
-import useScheduleActions from '../../hooks/useScheduleActions'
+import useActiveSchedule from '../../hooks/scheduledetails/useActiveSchedule.ts'
+import useScheduleActions from '../../hooks/scheduledetails/useScheduleActions.ts'
 import type { ScheduleState } from '../../types/schedule'
 import './MiniPlayerBar.css'
 
+// 진행 중인 일정에 대한 미니 플레이어 바 컴포넌트
+// 대체할 이름 없음
 const MiniPlayerBar = () => {
   const activeSchedule = useActiveSchedule()
   const scheduleActions = useScheduleActions(
