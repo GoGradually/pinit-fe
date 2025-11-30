@@ -35,8 +35,9 @@ const useWeeklySchedulePresence = ({ weekStart, anchorDate }: Options): UseWeekl
       setError(null)
       try {
         // 주간 일정을 한 번에 조회
-        const requestBase = anchorDate ?? weekStart
-        const time = toApiDateTimeKST(requestBase.hour(12))
+        const base = anchorDate ?? weekStart
+        // 주간 API가 주 내부 시각을 기대하므로 정오로 이동해 경계 문제 방지
+        const time = toApiDateTimeKST(base.hour(12))
         const schedules = await fetchWeeklySchedules(time)
         if (!isMounted) return
         setWeeklySchedules(schedules)
@@ -44,7 +45,10 @@ const useWeeklySchedulePresence = ({ weekStart, anchorDate }: Options): UseWeekl
         // 날짜별로 일정 그룹화
         const schedulesByDate = schedules.reduce<Record<string, ScheduleResponse[]>>(
           (acc, schedule) => {
-            const dateKey = toDateKey(schedule.date)
+            const dateKey =
+              typeof schedule.date === 'string' && schedule.date.length >= 10
+                ? schedule.date.slice(0, 10)
+                : toDateKey(schedule.date)
             if (!acc[dateKey]) {
               acc[dateKey] = []
             }
@@ -94,6 +98,12 @@ const useWeeklySchedulePresence = ({ weekStart, anchorDate }: Options): UseWeekl
       isMounted = false
     }
   }, [anchorDate, dateKeys, requestId, weekStart])
+
+  useEffect(() => {
+    const handleScheduleChanged = () => setRequestId(Date.now())
+    window.addEventListener('schedule:changed', handleScheduleChanged)
+    return () => window.removeEventListener('schedule:changed', handleScheduleChanged)
+  }, [])
 
   return {
     weeklySchedules,

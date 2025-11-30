@@ -19,6 +19,7 @@ import { useToast } from '../../../context/ToastContext'
 
 const SchedulesTabPage = () => {
   const [detailScheduleId, setDetailScheduleId] = useState<number | null>(null)
+  const [weekDirection, setWeekDirection] = useState<'forward' | 'backward'>('forward')
   const {
     currentWeekStart,
     selectedDate,
@@ -51,6 +52,11 @@ const SchedulesTabPage = () => {
   const refetchSchedules = () => {
     refetchPresence()
     refetchSchedulesRaw()
+  }
+
+  const handleChangeWeek = (offset: 1 | -1) => {
+    setWeekDirection(offset > 0 ? 'forward' : 'backward')
+    goToWeek(offset)
   }
 
   const presenceMapWithSelected = useMemo(() => {
@@ -139,16 +145,26 @@ const SchedulesTabPage = () => {
           }}
         />
       ) : null}
-      <div className="week-transition" key={currentWeekStart.toISOString()}>
+      <div
+        className={['week-transition', `week-transition--${weekDirection}`].join(' ')}
+        key={currentWeekStart.toISOString()}
+      >
         <WeeklyDateStrip
           weekStart={currentWeekStart}
           selectedDate={selectedDate}
           presenceMap={presenceMapWithSelected}
           onSelectDate={selectDate}
-          onChangeWeek={goToWeek}
+          onChangeWeek={handleChangeWeek}
         />
       </div>
-      <div className="schedules-tab__weekly-stats week-transition" key={`${currentWeekStart.toISOString()}-stats`}>
+      <div
+        className={[
+          'schedules-tab__weekly-stats',
+          'week-transition',
+          `week-transition--${weekDirection}`,
+        ].join(' ')}
+        key={`${currentWeekStart.toISOString()}-stats`}
+      >
         {isWeeklyStatsLoading ? (
           <span>이번 주 총 작업 시간을 불러오는 중...</span>
         ) : weeklyStatsError ? (
@@ -165,7 +181,7 @@ const SchedulesTabPage = () => {
           새로고침
         </button>
       </header>
-      <div className="schedules-tab__list fade-slide">
+      <div className={['schedules-tab__list', 'fade-slide', `week-transition--${weekDirection}`].join(' ')}>
         {isPresenceLoading || isScheduleLoading ? (
           <StatusPanel variant="loading" title="일정을 불러오는 중" />
         ) : scheduleError ? (

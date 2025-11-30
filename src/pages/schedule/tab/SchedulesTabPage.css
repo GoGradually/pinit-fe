@@ -135,21 +135,40 @@
 }
 
 .week-transition {
-  animation: fadeSlideIn 220ms ease;
+  animation: fadeSlideHorizontalForward 240ms ease;
+}
+
+.week-transition--forward {
+  animation: fadeSlideHorizontalForward 240ms ease;
+}
+
+.week-transition--backward {
+  animation: fadeSlideHorizontalBackward 240ms ease;
 }
 
 .fade-slide {
-  animation: fadeSlideIn 220ms ease;
+  animation: fadeSlideHorizontalForward 240ms ease;
 }
 
-@keyframes fadeSlideIn {
+@keyframes fadeSlideHorizontalForward {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateX(24px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeSlideHorizontalBackward {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

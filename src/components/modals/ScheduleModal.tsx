@@ -27,18 +27,26 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
 
   const handleSubmit = async (values: ScheduleFormValues) => {
     try {
+      let result: ScheduleResponse | null = null
       if (mode === 'create') {
-        await createSchedule({
+        result = await createSchedule({
           ...values,
           date: toApiDateTimeKST(values.date),
           deadline: toApiDateTimeKST(values.deadline),
         })
       } else if (schedule) {
-        await updateSchedule(schedule.id, {
+        result = await updateSchedule(schedule.id, {
           ...values,
           date: toApiDateTimeKST(values.date),
           deadline: toApiDateTimeKST(values.deadline),
         })
+      }
+      if (result) {
+        window.dispatchEvent(
+          new CustomEvent('schedule:changed', {
+            detail: { schedule: result, type: mode },
+          }),
+        )
       }
       onClose()
     } catch (error) {
