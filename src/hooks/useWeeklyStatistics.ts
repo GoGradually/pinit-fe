@@ -48,7 +48,7 @@ const useWeeklyStatistics = (options: Options = {}): UseWeeklyStatisticsReturn =
 
         if (isMounted) setStats(view)
       } catch (err) {
-        console.error('❌ Statistics fetch error:', err)
+        console.error('❌ statistics fetch error:', err)
         if (isMounted) setError(err instanceof Error ? err.message : '통계를 불러오는데 실패했습니다.')
       } finally {
         if (isMounted) setIsLoading(false)

@@ -1,10 +1,10 @@
-import useWeeklyStatistics from '../hooks/useWeeklyStatistics'
-import StatisticCard from '../components/statistics/StatisticCard'
-import DonutChart from '../components/statistics/DonutChart'
-import WeeklyBarChart from '../components/statistics/WeeklyBarChart'
-import StatusPanel from '../components/common/StatusPanel'
+import useWeeklyStatistics from '../../hooks/useWeeklyStatistics.ts'
+import StatisticCard from '../../components/statistics/StatisticCard.tsx'
+import DonutChart from '../../components/statistics/DonutChart.tsx'
+import WeeklyBarChart from '../../components/statistics/WeeklyBarChart.tsx'
+import StatusPanel from '../../components/common/StatusPanel.tsx'
 import './StatisticsTabPage.css'
-import { formatMinutesToTime } from '../utils/statisticsTransform'
+import { formatMinutesToTime } from '../../utils/statisticsTransform.ts'
 
 const StatisticsTabPage = () => {
   const { stats, isLoading, error, refetch } = useWeeklyStatistics()
