@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react'
-import { ScheduleModalContext } from '../../context/ScheduleModalContext.tsx'
+import { ScheduleModalContext } from '../../../context/ScheduleModalContext.tsx'
 
 const ScheduleCreateTabPage = () => {
   const modal = useContext(ScheduleModalContext)

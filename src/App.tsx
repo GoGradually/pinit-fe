@@ -1,11 +1,11 @@
 import './App.css'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import AppShell from './components/layout/AppShell'
-import SchedulesTabPage from './pages/scheduletab/SchedulesTabPage.tsx'
-import ScheduleCreateTabPage from './pages/schedulecreate/ScheduleCreateTabPage.tsx'
+import SchedulesTabPage from './pages/schedule/tab/SchedulesTabPage.tsx'
+import ScheduleCreateTabPage from './pages/schedule/create/ScheduleCreateTabPage.tsx'
 import StatisticsTabPage from './pages/statistics/StatisticsTabPage.tsx'
 import SettingsPage from './pages/setting/SettingsPage.tsx'
-import ScheduleDetailPage from './pages/scheduletab/ScheduleDetailPage.tsx'
+import ScheduleDetailPage from './pages/schedule/detail/ScheduleDetailPage.tsx'
 import { ScheduleCacheProvider } from './context/ScheduleCacheContext'
 
 function App() {

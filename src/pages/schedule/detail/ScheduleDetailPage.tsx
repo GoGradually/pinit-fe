@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
 import { useContext } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ScheduleModalContext } from '../../context/ScheduleModalContext.tsx'
-import useScheduleDetail from '../../hooks/useScheduleDetail.ts'
-import useScheduleActions from '../../hooks/useScheduleActions.ts'
+import { ScheduleModalContext } from '../../../context/ScheduleModalContext.tsx'
+import useScheduleDetail from '../../../hooks/useScheduleDetail.ts'
+import useScheduleActions from '../../../hooks/useScheduleActions.ts'
 import './ScheduleDetailPage.css'
 
 const ScheduleDetailPage = () => {
