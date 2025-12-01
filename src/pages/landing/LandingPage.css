@@ -1,0 +1,253 @@
+.landing {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+  padding: 32px 16px 48px;
+}
+
+.landing__hero {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  border-radius: 20px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.landing__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #e8f0fe;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+}
+
+.landing__logo-mark {
+  width: 20px;
+  height: 20px;
+}
+
+.landing h1 {
+  margin: 12px 0 8px;
+  font-size: 30px;
+  line-height: 1.25;
+}
+
+.landing p {
+  max-width: 600px;
+  color: #475569;
+}
+
+.landing__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.landing__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.landing__action--primary {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color: #f8fafc;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.18);
+}
+
+.landing__action--ghost {
+  border: 1px solid #dbeafe;
+  color: #1e3a8a;
+  background: #f8fafc;
+}
+
+.landing__action:active {
+  transform: translateY(1px);
+}
+
+.landing__glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+}
+
+.landing__glow--one {
+  width: 240px;
+  height: 240px;
+  background: rgba(96, 165, 250, 0.35);
+  top: -50px;
+  right: -60px;
+}
+
+.landing__glow--two {
+  width: 200px;
+  height: 200px;
+  background: rgba(248, 113, 113, 0.28);
+  bottom: -70px;
+  left: 20px;
+}
+
+.landing__panel {
+  max-width: 640px;
+  margin: 16px auto 0;
+  display: grid;
+  gap: 12px;
+}
+
+.landing__slider {
+  max-width: 640px;
+  margin: 16px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.landing__slide {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.landing__slide-header h2 {
+  margin-bottom: 4px;
+  color: #0f172a;
+}
+
+.landing__slide-header p {
+  margin: 0;
+  color: #475569;
+}
+
+.landing__bullets {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landing__bullets li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: #0f172a;
+}
+
+.landing__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa, #f87171);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.landing__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #f8fafc;
+  text-decoration: none;
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+.landing__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.landing__pagination button {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.landing__pagination button:disabled {
+  opacity: 0.5;
+}
+
+.landing__dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.landing__dots button {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid #94a3b8;
+  background: #fff;
+  padding: 0;
+}
+
+.landing__dots button.is-active {
+  width: 20px;
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  border-color: transparent;
+}
+
+.landing__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  color: #1d4ed8;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.landing__logo-chip {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  .landing__hero {
+    padding: 24px 20px;
+  }
+
+  .landing__actions {
+    flex-direction: column;
+  }
+}

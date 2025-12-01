@@ -10,6 +10,8 @@ import ScheduleCreateModal from './components/modals/ScheduleCreateModal.tsx'
 import ScheduleEditModal from './components/modals/ScheduleEditModal.tsx'
 import { ScheduleViewStateProvider } from './context/ScheduleViewStateContext'
 import { ToastProvider } from './context/ToastContext'
+import LandingPage from './pages/landing/LandingPage.tsx'
+import LoginPage from './pages/auth/LoginPage.tsx'
 
 function App() {
   return (
@@ -18,7 +20,8 @@ function App() {
         <ToastProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Navigate to="/app/schedules" replace />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
               <Route path="/app" element={<AppShell />}>
                 <Route index element={<Navigate to="/app/schedules" replace />} />
                 <Route path="schedules" element={<SchedulesTabPage />} />

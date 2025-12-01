@@ -32,7 +32,7 @@ const TopBar = ({
             ←
           </button>
         ) : (
-          <span className="top-bar__placeholder">📌</span>
+          <span className="top-bar__placeholder"><img src="/icons/icon.svg" alt="Pinit 아이콘" className="top-bar-logo"/></span>
         )}
       </div>
       <div className="top-bar__title" aria-live="polite">

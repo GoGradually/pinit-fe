@@ -22,6 +22,11 @@
   height: 24px;
 }
 
+.top-bar-logo {
+    width: 30px;
+    height: 30px;
+}
+
 .top-bar__title {
   font-size: 18px;
   font-weight: 600;
