@@ -6,6 +6,7 @@ type ScheduleCardProps = {
   onOpenDetail: (scheduleId: number) => void
   onDelete: (scheduleId: number) => void
   onStart: (scheduleId: number) => void
+  onComplete: (scheduleId: number) => void
   onCancel: (scheduleId: number) => void
 }
 
@@ -38,7 +39,14 @@ const stateIcon: Record<ScheduleSummary['state'], string> = {
  * @param onCancel - 취소 핸들러
  * @constructor
  */
-const ScheduleCard = ({ schedule, onOpenDetail, onDelete, onStart, onCancel }: ScheduleCardProps) => {
+const ScheduleCard = ({
+  schedule,
+  onOpenDetail,
+  onDelete,
+  onStart,
+  onComplete,
+  onCancel,
+}: ScheduleCardProps) => {
   const { id, title, description, importance, urgency, taskType, state } = schedule
 
   const handleClick = () => {
@@ -59,14 +67,19 @@ const ScheduleCard = ({ schedule, onOpenDetail, onDelete, onStart, onCancel }: S
       // 미시작 → 시작
       onStart(id)
     } else if (state === 'COMPLETED') {
-      // 완료 → 취소 확인 모달
-      if (window.confirm(`"${title}" 일정을 취소하시겠습니까?\n미시작 상태로 돌아갑니다.`)) {
-        onCancel(id)
-      }
+      // 완료 → 즉시 미시작으로 전이
+      onCancel(id)
     }
   }
 
   const isStateClickable = state === 'NOT_STARTED' || state === 'COMPLETED'
+  const stateClassName = `schedule-card__state-icon--${state.toLowerCase()}`
+
+  const handleQuickComplete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (state === 'COMPLETED') return
+    onComplete(id)
+  }
 
   return (
     <article
@@ -85,7 +98,13 @@ const ScheduleCard = ({ schedule, onOpenDetail, onDelete, onStart, onCancel }: S
       <header className="schedule-card__header">
         <div className="schedule-card__header-left">
           <button
-            className={`schedule-card__state-icon ${isStateClickable ? 'schedule-card__state-icon--clickable' : ''}`}
+            className={[
+              'schedule-card__state-icon',
+              stateClassName,
+              isStateClickable ? 'schedule-card__state-icon--clickable' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
             onClick={handleStateIconClick}
             disabled={!isStateClickable}
             title={stateLabel[state]}
@@ -115,10 +134,19 @@ const ScheduleCard = ({ schedule, onOpenDetail, onDelete, onStart, onCancel }: S
           <span className="schedule-card__pill">중요도 {importance}</span>
           <span className="schedule-card__pill">긴급도 {urgency}</span>
         </div>
+        {state === 'NOT_STARTED' && (
+          <button
+            type="button"
+            className="schedule-card__quick-complete"
+            onClick={handleQuickComplete}
+            aria-label="즉시 완료"
+          >
+            ✓ 즉시 완료
+          </button>
+        )}
       </footer>
     </article>
   )
 }
 
 export default ScheduleCard
-

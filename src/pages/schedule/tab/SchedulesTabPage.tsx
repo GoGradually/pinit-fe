@@ -9,7 +9,13 @@ import ScheduleCard from '../../../components/schedules/ScheduleCard.tsx'
 import useScheduleList from '../../../hooks/useScheduleList.ts'
 import StatusPanel from '../../../components/common/StatusPanel.tsx'
 import ScheduleDetailModal from '../../../components/modals/ScheduleDetailModal.tsx'
-import { deleteSchedule, startSchedule, cancelSchedule, fetchScheduleDetail } from '../../../api/schedules.ts'
+import {
+  deleteSchedule,
+  startSchedule,
+  cancelSchedule,
+  completeSchedule,
+  fetchScheduleDetail,
+} from '../../../api/schedules.ts'
 import type { ScheduleResponse } from '../../../types/schedule'
 import useWeeklyStatistics from '../../../hooks/useWeeklyStatistics.ts'
 import { formatMinutesToTime } from '../../../utils/statisticsTransform.ts'
@@ -158,6 +164,29 @@ const SchedulesTabPage = () => {
     }
   }
 
+  const handleComplete = async (scheduleId: number) => {
+    console.log(`✅ Complete schedule ${scheduleId}`)
+    try {
+      await completeSchedule(scheduleId)
+      updateScheduleState(scheduleId, 'COMPLETED')
+      if (activeScheduleId === scheduleId) {
+        setActiveSchedule(null)
+      }
+      try {
+        const detail = await fetchScheduleDetail(scheduleId)
+        setSchedule(detail)
+        updateScheduleState(scheduleId, detail.state)
+      } catch (error) {
+        console.error('⚠️ Failed to refresh schedule detail after complete:', error)
+      }
+      refetchSchedules()
+      refetchPresence()
+    } catch (error) {
+      console.error(`❌ Complete failed for schedule ${scheduleId}:`, error)
+      addToast('일정 완료에 실패했습니다.', 'error')
+    }
+  }
+
   return (
     <section className="schedules-tab">
       {isOverdueLoading ? (
@@ -225,6 +254,7 @@ const SchedulesTabPage = () => {
                 onOpenDetail={setDetailScheduleId}
                 onDelete={handleDelete}
                 onStart={handleStart}
+                onComplete={handleComplete}
                 onCancel={handleCancel}
               />
             </div>
