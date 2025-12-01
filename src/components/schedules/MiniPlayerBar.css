@@ -32,17 +32,45 @@
   gap: 8px;
 }
 
-.mini-player__buttons button {
+.mini-player__button {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   border: none;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  font-size: 14px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.1));
+  color: #0b1b42;
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 160ms ease;
 }
 
-.mini-player__buttons button:disabled {
-  opacity: 0.4;
+.mini-player__button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.2);
 }
 
+.mini-player__button:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+  transform: none;
+}
+
+.mini-player__button--start {
+  background: linear-gradient(135deg, #a7f3d0, #34d399);
+  color: #064e3b;
+}
+
+.mini-player__button--pause {
+  background: linear-gradient(135deg, #fef9c3, #facc15);
+  color: #713f12;
+}
+
+.mini-player__button--complete {
+  background: linear-gradient(135deg, #bfdbfe, #60a5fa);
+  color: #0b3b7e;
+}
+
+.mini-player__button--cancel {
+  background: linear-gradient(135deg, #fecdd3, #f43f5e);
+  color: #7f1d1d;
+}

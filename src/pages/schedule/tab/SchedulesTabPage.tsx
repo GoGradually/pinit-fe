@@ -6,16 +6,17 @@ import OverdueBanner from '../../../components/schedules/OverdueBanner.tsx'
 import useWeeklySchedulePresence from '../../../hooks/useWeeklySchedulePresence.ts'
 import useOverdueSchedulesSummary from '../../../hooks/useOverdueSchedulesSummary.ts'
 import ScheduleCard from '../../../components/schedules/ScheduleCard.tsx'
-import ScheduleItemActions from '../../../components/schedules/ScheduleItemActions.tsx'
 import useScheduleList from '../../../hooks/useScheduleList.ts'
 import StatusPanel from '../../../components/common/StatusPanel.tsx'
 import ScheduleDetailModal from '../../../components/modals/ScheduleDetailModal.tsx'
-import { deleteSchedule, startSchedule, cancelSchedule } from '../../../api/schedules.ts'
+import { deleteSchedule, startSchedule, cancelSchedule, fetchScheduleDetail } from '../../../api/schedules.ts'
+import type { ScheduleResponse } from '../../../types/schedule'
 import useWeeklyStatistics from '../../../hooks/useWeeklyStatistics.ts'
 import { formatMinutesToTime } from '../../../utils/statisticsTransform.ts'
 import './SchedulesTabPage.css'
 import '../../../utils/datetime.ts'
 import { useToast } from '../../../context/ToastContext'
+import { useScheduleCache } from '../../../context/ScheduleCacheContext'
 
 const SchedulesTabPage = () => {
   const [detailScheduleId, setDetailScheduleId] = useState<number | null>(null)
@@ -46,8 +47,23 @@ const SchedulesTabPage = () => {
     error: weeklyStatsError,
     refetch: refetchWeeklyStats,
   } = useWeeklyStatistics({ weekStart: statsWeekStart })
+  const {
+    setSchedule,
+    setActiveSchedule,
+    updateScheduleState,
+    activeScheduleId,
+    schedulesById,
+  } = useScheduleCache()
 
-  const schedules = schedulesByDate
+  const schedules = useMemo(
+    () =>
+      schedulesByDate.map((item) => {
+        const cached = schedulesById[item.id]
+        if (!cached) return item
+        return { ...item, state: cached.state }
+      }),
+    [schedulesByDate, schedulesById],
+  )
   const isScheduleLoading = isPresenceLoading || isScheduleLoadingRaw
   const scheduleError = scheduleErrorRaw ?? presenceError
   const refetchSchedules = () => {
@@ -75,6 +91,10 @@ const SchedulesTabPage = () => {
     }
   }, [addToast, scheduleError])
 
+  useEffect(() => {
+    schedulesByDate.forEach((schedule) => setSchedule(schedule as unknown as ScheduleResponse))
+  }, [schedulesByDate, setSchedule])
+
   const handleRefresh = () => {
     console.log('🔄 Manual refresh triggered')
     refetchPresence()
@@ -83,22 +103,14 @@ const SchedulesTabPage = () => {
     refetchWeeklyStats()
   }
 
-  const handleActionClick = async (scheduleId: number, action: () => Promise<void>) => {
-    console.log(`🔘 Action button clicked for schedule ${scheduleId}`)
-    try {
-      await action()
-      console.log(`✅ Action completed for schedule ${scheduleId}`)
-      refetchSchedules()
-    } catch (error) {
-      console.error(`❌ Action failed for schedule ${scheduleId}:`, error)
-    }
-  }
-
   const handleDelete = async (scheduleId: number) => {
     console.log(`🗑️ Delete schedule ${scheduleId}`)
     try {
       await deleteSchedule(scheduleId)
       console.log(`✅ Schedule deleted: ${scheduleId}`)
+      if (activeScheduleId === scheduleId) {
+        setActiveSchedule(null)
+      }
       refetchSchedules()
       refetchPresence()
     } catch (error) {
@@ -112,6 +124,15 @@ const SchedulesTabPage = () => {
     try {
       await startSchedule(scheduleId)
       console.log(`✅ Schedule started: ${scheduleId}`)
+      updateScheduleState(scheduleId, 'IN_PROGRESS')
+      try {
+        const detail = await fetchScheduleDetail(scheduleId)
+        setSchedule(detail)
+        setActiveSchedule(scheduleId)
+        updateScheduleState(scheduleId, detail.state)
+      } catch (error) {
+        console.error('⚠️ Failed to cache active schedule detail after start:', error)
+      }
       refetchSchedules()
       refetchPresence()
     } catch (error) {
@@ -125,6 +146,10 @@ const SchedulesTabPage = () => {
     try {
       await cancelSchedule(scheduleId)
       console.log(`✅ Schedule cancelled: ${scheduleId}`)
+      updateScheduleState(scheduleId, 'NOT_STARTED')
+      if (activeScheduleId === scheduleId) {
+        setActiveSchedule(null)
+      }
       refetchSchedules()
       refetchPresence()
     } catch (error) {
@@ -201,10 +226,6 @@ const SchedulesTabPage = () => {
                 onDelete={handleDelete}
                 onStart={handleStart}
                 onCancel={handleCancel}
-              />
-              <ScheduleItemActions
-                schedule={schedule}
-                onActionClick={handleActionClick}
               />
             </div>
           ))

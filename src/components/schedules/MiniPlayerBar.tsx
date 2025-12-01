@@ -25,10 +25,34 @@ const MiniPlayerBar = () => {
           <p className="mini-player__description">{activeSchedule.title}</p>
         </div>
         <div className="mini-player__buttons">
-          <button onClick={scheduleActions.start} disabled={!scheduleActions.canStart}>▶</button>
-          <button onClick={scheduleActions.pause} disabled={!scheduleActions.canPause}>Ⅱ</button>
-          <button onClick={scheduleActions.complete} disabled={!scheduleActions.canComplete}>✓</button>
-          <button onClick={scheduleActions.cancel} disabled={!scheduleActions.canCancel}>✕</button>
+          <button
+            className="mini-player__button mini-player__button--start"
+            onClick={scheduleActions.start}
+            disabled={!scheduleActions.canStart}
+          >
+            ▶
+          </button>
+          <button
+            className="mini-player__button mini-player__button--pause"
+            onClick={scheduleActions.pause}
+            disabled={!scheduleActions.canPause}
+          >
+            Ⅱ
+          </button>
+          <button
+            className="mini-player__button mini-player__button--complete"
+            onClick={scheduleActions.complete}
+            disabled={!scheduleActions.canComplete}
+          >
+            ✓
+          </button>
+          <button
+            className="mini-player__button mini-player__button--cancel"
+            onClick={scheduleActions.cancel}
+            disabled={!scheduleActions.canCancel}
+          >
+            ✕
+          </button>
         </div>
       </aside>
     </div>
@@ -36,4 +60,3 @@ const MiniPlayerBar = () => {
 }
 
 export default MiniPlayerBar
-
