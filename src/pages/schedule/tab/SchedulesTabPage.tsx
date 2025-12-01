@@ -39,12 +39,13 @@ const SchedulesTabPage = () => {
   } = useScheduleList(selectedDate)
   const { summary: overdueSummary, isLoading: isOverdueLoading, refetch: refetchOverdue } =
     useOverdueSchedulesSummary()
+  const statsWeekStart = useMemo(() => currentWeekStart.add(1, 'day'), [currentWeekStart])
   const {
     current: weeklyStats,
     isLoading: isWeeklyStatsLoading,
     error: weeklyStatsError,
     refetch: refetchWeeklyStats,
-  } = useWeeklyStatistics({ weekStart: currentWeekStart.add(1, 'day') })
+  } = useWeeklyStatistics({ weekStart: statsWeekStart })
 
   const schedules = schedulesByDate
   const isScheduleLoading = isPresenceLoading || isScheduleLoadingRaw
