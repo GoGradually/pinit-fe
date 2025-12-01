@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import type { CSSProperties } from 'react'
 import useScheduleForm from '../../hooks/useScheduleForm'
 import { SEOUL_TZ } from '../../utils/datetime'
 import type { ScheduleTaskType, ScheduleFormValues } from '../../types/schedule'
@@ -26,6 +27,11 @@ const formatDateTimeLocalValue = (value: Date) =>
   dayjs(value).tz(SEOUL_TZ).format('YYYY-MM-DDTHH:mm')
 
 const parseDateTimeLocalValue = (value: string) => dayjs.tz(value, SEOUL_TZ).toDate()
+
+const buildRangeStyle = (value: number, color: string): CSSProperties => ({
+  '--range-progress': `${((value - 1) / 8) * 100}%`,
+  '--range-color': color,
+})
 
 /**
  * 일정 생성/수정 폼 컴포넌트
@@ -108,27 +114,47 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
         </select>
       </label>
 
-      <label className="schedule-form__field">
-        <span>중요도 (1~9)</span>
+      <label className="schedule-form__field schedule-form__range-field">
+        <div className="schedule-form__range-header">
+          <span>중요도</span>
+          <span className="schedule-form__range-value">{form.values.importance}</span>
+        </div>
         <input
-          type="number"
+          type="range"
           min={1}
           max={9}
+          step={1}
           value={form.values.importance}
           onChange={(event) => form.onChange('importance', Number(event.target.value))}
+          className="schedule-form__range-input"
+          style={buildRangeStyle(form.values.importance, '#60a5fa')}
         />
+        <div className="schedule-form__range-scale">
+          <span>1</span>
+          <span>9</span>
+        </div>
         {form.errors.importance && <small>{form.errors.importance}</small>}
       </label>
 
-      <label className="schedule-form__field">
-        <span>긴급도 (1~9)</span>
+      <label className="schedule-form__field schedule-form__range-field">
+        <div className="schedule-form__range-header">
+          <span>긴급도</span>
+          <span className="schedule-form__range-value">{form.values.urgency}</span>
+        </div>
         <input
-          type="number"
+          type="range"
           min={1}
           max={9}
+          step={1}
           value={form.values.urgency}
           onChange={(event) => form.onChange('urgency', Number(event.target.value))}
+          className="schedule-form__range-input"
+          style={buildRangeStyle(form.values.urgency, '#f87171')}
         />
+        <div className="schedule-form__range-scale">
+          <span>1</span>
+          <span>9</span>
+        </div>
         {form.errors.urgency && <small>{form.errors.urgency}</small>}
       </label>
 

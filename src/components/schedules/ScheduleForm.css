@@ -15,7 +15,7 @@
   font-size: 14px;
 }
 
-.schedule-form__field input,
+.schedule-form__field input:not([type='range']),
 .schedule-form__field textarea,
 .schedule-form__field select {
   border-radius: 12px;
@@ -68,4 +68,74 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
+}
+
+.schedule-form__range-field {
+  gap: 10px;
+}
+
+.schedule-form__range-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.schedule-form__range-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background-color: #e2e8f0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.schedule-form__range-input {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--range-color, #2563eb) 0%,
+    var(--range-color, #2563eb) var(--range-progress, 50%),
+    #e2e8f0 var(--range-progress, 50%),
+    #e2e8f0 100%
+  );
+  outline: none;
+}
+
+.schedule-form__range-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--range-color, #2563eb);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.schedule-form__range-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--range-color, #2563eb);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.schedule-form__range-input::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.schedule-form__range-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
 }
