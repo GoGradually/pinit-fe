@@ -26,7 +26,7 @@ const stateLabel: Record<ScheduleSummary['state'], string> = {
 
 const stateIcon: Record<ScheduleSummary['state'], string> = {
   NOT_STARTED: '☐',  // 빈 박스
-  IN_PROGRESS: '▶▶',  // >>
+  IN_PROGRESS: '▶',  // >>
   COMPLETED: '✓',     // 체크
   SUSPENDED: '⏸',     // 일시정지
 }
