@@ -231,6 +231,14 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "zoneId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -315,6 +323,14 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "zoneId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -398,6 +414,14 @@
             "schema": {
               "type": "string",
               "format": "date-time"
+            }
+          },
+          {
+            "name": "zoneId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -794,6 +818,14 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "zoneId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -855,6 +887,14 @@
             "schema": {
               "type": "string",
               "format": "date-time"
+            }
+          },
+          {
+            "name": "zoneId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -952,6 +992,26 @@
   },
   "components": {
     "schemas": {
+      "DateTimeWithZone": {
+        "type": "object",
+        "properties": {
+          "dateTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "지역 시각",
+            "example": "2024-03-01T18:00:00"
+          },
+          "zoneId": {
+            "type": "string",
+            "description": "시간대 ID",
+            "example": "Asia/Seoul"
+          }
+        },
+        "required": [
+          "dateTime",
+          "zoneId"
+        ]
+      },
       "DependencyRequest": {
         "type": "object",
         "properties": {
@@ -989,10 +1049,12 @@
             "minLength": 1
           },
           "deadline": {
-            "type": "string",
-            "format": "date-time",
+            "$ref": "#/components/schemas/DateTimeWithZone",
             "description": "마감 기한",
-            "example": "2024-03-01T18:00:00+09:00[Asia/Seoul]"
+            "example": {
+              "dateTime": "2024-03-01T18:00:00",
+              "zoneId": "Asia/Seoul"
+            }
           },
           "importance": {
             "type": "integer",
@@ -1021,10 +1083,12 @@
             "example": "TASK"
           },
           "date": {
-            "type": "string",
-            "format": "date-time",
+            "$ref": "#/components/schemas/DateTimeWithZone",
             "description": "일정 시작 예정 시각",
-            "example": "2024-02-28T09:00:00+09:00[Asia/Seoul]"
+            "example": {
+              "dateTime": "2024-02-28T09:00:00",
+              "zoneId": "Asia/Seoul"
+            }
           },
           "removeDependencies": {
             "type": "array",
@@ -1097,13 +1161,11 @@
             "description": "일정 설명"
           },
           "date": {
-            "type": "string",
-            "format": "date-time",
+            "$ref": "#/components/schemas/DateTimeWithZone",
             "description": "일정 시작 예정 시각"
           },
           "deadline": {
-            "type": "string",
-            "format": "date-time",
+            "$ref": "#/components/schemas/DateTimeWithZone",
             "description": "마감 기한"
           },
           "importance": {
@@ -1132,8 +1194,7 @@
             "description": "회원 ID"
           },
           "startOfWeek": {
-            "type": "string",
-            "format": "date-time",
+            "$ref": "#/components/schemas/DateTimeWithZone",
             "description": "통계 기준 주간의 시작 시각"
           },
           "deepWorkElapsedTime": {
