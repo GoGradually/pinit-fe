@@ -1,9 +1,11 @@
 import dayjs from 'dayjs'
+import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import useScheduleForm from '../../hooks/useScheduleForm'
 import { SEOUL_TZ } from '../../utils/datetime'
-import type { ScheduleTaskType, ScheduleFormValues } from '../../types/schedule'
+import type { ScheduleTaskType, ScheduleFormValues, ScheduleSummary } from '../../types/schedule'
 import './ScheduleForm.css'
+import ScheduleDependencyModal from '../modals/ScheduleDependencyModal'
 
 type ScheduleFormProps = {
   initialValues?: Partial<ScheduleFormValues>
@@ -17,18 +19,17 @@ const taskTypeOptions: { value: ScheduleTaskType; label: string }[] = [
   { value: 'ADMIN_TASK', label: '행정 작업' },
 ]
 
-const dependencyMockOptions = [
-  { id: 101, title: '기획안 마무리' },
-  { id: 102, title: '자료 조사' },
-  { id: 103, title: '리뷰 일정' },
-]
-
 const formatDateTimeLocalValue = (value: Date) =>
   dayjs(value).tz(SEOUL_TZ).format('YYYY-MM-DDTHH:mm')
 
 const parseDateTimeLocalValue = (value: string) => dayjs.tz(value, SEOUL_TZ).toDate()
 
-const buildRangeStyle = (value: number, color: string): CSSProperties => ({
+type RangeStyle = CSSProperties & {
+  '--range-progress'?: string
+  '--range-color'?: string
+}
+
+const buildRangeStyle = (value: number, color: string): RangeStyle => ({
   '--range-progress': `${((value - 1) / 8) * 100}%`,
   '--range-color': color,
 })
@@ -42,25 +43,8 @@ const buildRangeStyle = (value: number, color: string): CSSProperties => ({
  */
 const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }: ScheduleFormProps) => {
   const form = useScheduleForm({ initialValues })
-
-  const toggleId = (list: number[], id: number) =>
-    list.includes(id) ? list.filter((item) => item !== id) : [...list, id]
-
-  const handlePreviousToggle = (id: number) => {
-    const updated = toggleId(form.values.previousTaskIds, id)
-    form.onChange('previousTaskIds', updated)
-    if (form.values.nextTaskIds.includes(id)) {
-      form.onChange('nextTaskIds', form.values.nextTaskIds.filter((item) => item !== id))
-    }
-  }
-
-  const handleNextToggle = (id: number) => {
-    const updated = toggleId(form.values.nextTaskIds, id)
-    form.onChange('nextTaskIds', updated)
-    if (form.values.previousTaskIds.includes(id)) {
-      form.onChange('previousTaskIds', form.values.previousTaskIds.filter((item) => item !== id))
-    }
-  }
+  const [dependencyMeta, setDependencyMeta] = useState<Record<number, { title: string }>>({})
+  const [modalMode, setModalMode] = useState<null | 'previous' | 'next'>(null)
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -73,6 +57,57 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
       form.setSubmitting(false)
     }
   }
+
+  const handleApplyDependencies = (mode: 'previous' | 'next', selections: ScheduleSummary[]) => {
+    const ids = selections.map((item) => item.id)
+    const metas = selections.reduce<Record<number, { title: string }>>((acc, item) => {
+      acc[item.id] = { title: item.title }
+      return acc
+    }, {})
+
+    setDependencyMeta((prev) => ({ ...prev, ...metas }))
+
+    if (mode === 'previous') {
+      const nextPrev = Array.from(new Set([...form.values.previousTaskIds, ...ids])).filter(
+        (id) => !form.values.nextTaskIds.includes(id),
+      )
+      const nextNext = form.values.nextTaskIds.filter((id) => !ids.includes(id))
+      form.onChange('previousTaskIds', nextPrev)
+      form.onChange('nextTaskIds', nextNext)
+    } else {
+      const nextNext = Array.from(new Set([...form.values.nextTaskIds, ...ids])).filter(
+        (id) => !form.values.previousTaskIds.includes(id),
+      )
+      const nextPrev = form.values.previousTaskIds.filter((id) => !ids.includes(id))
+      form.onChange('previousTaskIds', nextPrev)
+      form.onChange('nextTaskIds', nextNext)
+    }
+    setModalMode(null)
+  }
+
+  const removeDependency = (mode: 'previous' | 'next', id: number) => {
+    const nextPrev =
+      mode === 'previous'
+        ? form.values.previousTaskIds.filter((item) => item !== id)
+        : form.values.previousTaskIds
+    const nextNext =
+      mode === 'next' ? form.values.nextTaskIds.filter((item) => item !== id) : form.values.nextTaskIds
+
+    if (mode === 'previous') {
+      form.onChange('previousTaskIds', nextPrev)
+    } else {
+      form.onChange('nextTaskIds', nextNext)
+    }
+    setDependencyMeta((prev) => {
+      const stillUsed = nextPrev.includes(id) || nextNext.includes(id)
+      if (stillUsed) return prev
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
+  }
+
+  const selectedMeta = (id: number) => dependencyMeta[id]?.title ?? `일정 #${id}`
 
   return (
     <form
@@ -182,34 +217,62 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
       <section className="schedule-form__dependency">
         <header>
           <h3>이전/이후 일정</h3>
-          <p>같은 일정을 두 목록에 동시에 추가할 수 없어요.</p>
+          <p>버튼을 눌러 달력에서 일정을 선택하세요. 같은 일정을 두 목록에 동시에 추가할 수 없어요.</p>
         </header>
         <div className="schedule-form__dependency-groups">
-          <div>
-            <h4>이전에 해야 하는 일정</h4>
-            {dependencyMockOptions.map((option) => (
-              <label key={option.id} className="schedule-form__checkbox">
-                <input
-                  type="checkbox"
-                  checked={form.values.previousTaskIds.includes(option.id)}
-                  onChange={() => handlePreviousToggle(option.id)}
-                />
-                <span>{option.title}</span>
-              </label>
-            ))}
+          <div className="schedule-form__dependency-column">
+            <div className="schedule-form__dependency-header">
+              <h4>이전에 해야 하는 일정</h4>
+              <button type="button" onClick={() => setModalMode('previous')}>
+                달력에서 선택
+              </button>
+            </div>
+            {form.values.previousTaskIds.length === 0 ? (
+              <p className="schedule-form__dependency-empty">선택된 일정이 없습니다.</p>
+            ) : (
+              <div className="schedule-form__dependency-tags">
+                {form.values.previousTaskIds.map((id) => (
+                  <span key={id} className="schedule-form__tag">
+                    {selectedMeta(id)}
+                    <button
+                      type="button"
+                      className="schedule-form__tag-remove"
+                      onClick={() => removeDependency('previous', id)}
+                      aria-label="이전 일정 제거"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-          <div>
-            <h4>이후에 해야 하는 일정</h4>
-            {dependencyMockOptions.map((option) => (
-              <label key={option.id} className="schedule-form__checkbox">
-                <input
-                  type="checkbox"
-                  checked={form.values.nextTaskIds.includes(option.id)}
-                  onChange={() => handleNextToggle(option.id)}
-                />
-                <span>{option.title}</span>
-              </label>
-            ))}
+          <div className="schedule-form__dependency-column">
+            <div className="schedule-form__dependency-header">
+              <h4>이후에 해야 하는 일정</h4>
+              <button type="button" onClick={() => setModalMode('next')}>
+                달력에서 선택
+              </button>
+            </div>
+            {form.values.nextTaskIds.length === 0 ? (
+              <p className="schedule-form__dependency-empty">선택된 일정이 없습니다.</p>
+            ) : (
+              <div className="schedule-form__dependency-tags">
+                {form.values.nextTaskIds.map((id) => (
+                  <span key={id} className="schedule-form__tag is-next">
+                    {selectedMeta(id)}
+                    <button
+                      type="button"
+                      className="schedule-form__tag-remove"
+                      onClick={() => removeDependency('next', id)}
+                      aria-label="이후 일정 제거"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -222,6 +285,18 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
           {form.isSubmitting ? '저장 중...' : submitLabel}
         </button>
       </div>
+
+      {modalMode && (
+        <ScheduleDependencyModal
+          isOpen={Boolean(modalMode)}
+          mode={modalMode}
+          onClose={() => setModalMode(null)}
+          selectedIds={
+            modalMode === 'previous' ? form.values.previousTaskIds : form.values.nextTaskIds
+          }
+          onApply={(schedules) => handleApplyDependencies(modalMode, schedules)}
+        />
+      )}
     </form>
   )
 }

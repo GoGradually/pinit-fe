@@ -18,6 +18,8 @@ export type ScheduleResponse = {
   importance: number
   urgency: number
   state: ScheduleState
+  previousTasks?: ScheduleSummary[]
+  nextTasks?: ScheduleSummary[]
 }
 
 export type DependencyRequest = {
@@ -60,6 +62,8 @@ export type ScheduleSummary = {
   urgency: number
   taskType?: ScheduleTaskType // 백엔드에서 제공하지 않을 수 있음
   state: ScheduleState
+  previousTasks?: ScheduleSummary[]
+  nextTasks?: ScheduleSummary[]
 }
 
 export type DateSchedulePresence = Record<

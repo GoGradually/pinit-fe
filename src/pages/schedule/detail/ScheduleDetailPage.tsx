@@ -3,7 +3,9 @@ import useScheduleDetail from '../../../hooks/useScheduleDetail.ts'
 import useScheduleActions from '../../../hooks/scheduledetails/useScheduleActions.ts'
 import { formatDateTimeWithZone } from '../../../utils/datetime.ts'
 import { getImportanceStyle, getUrgencyStyle } from '../../../utils/priorityStyles.ts'
+import type { ScheduleSummary } from '../../../types/schedule'
 import './ScheduleDetailPage.css'
+import '../../../components/schedules/ScheduleForm.css'
 
 const ScheduleDetailPage = () => {
   const { scheduleId } = useParams()
@@ -19,6 +21,8 @@ const ScheduleDetailPage = () => {
   const deadline = formatDateTimeWithZone(schedule.deadline)
   const importanceStyle = getImportanceStyle(schedule.importance)
   const urgencyStyle = getUrgencyStyle(schedule.urgency)
+  const previousTasks: ScheduleSummary[] = schedule.previousTasks ?? []
+  const nextTasks: ScheduleSummary[] = schedule.nextTasks ?? []
 
   return (
     <section className="schedule-detail">
@@ -44,6 +48,43 @@ const ScheduleDetailPage = () => {
           시작: {startTime}
           <br />마감: {deadline}
         </p>
+      </section>
+      <section className="schedule-detail__section">
+        <h2>이전/이후 일정</h2>
+        <div className="schedule-form__dependency-groups">
+          <div className="schedule-form__dependency-column">
+            <div className="schedule-form__dependency-header">
+              <h4>이전에 해야 하는 일정</h4>
+            </div>
+            {previousTasks.length === 0 ? (
+              <p className="schedule-form__dependency-empty">연결된 이전 일정이 없습니다.</p>
+            ) : (
+              <div className="schedule-form__dependency-tags">
+                {previousTasks.map((task) => (
+                  <span key={task.id} className="schedule-form__tag">
+                    {task.title}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="schedule-form__dependency-column">
+            <div className="schedule-form__dependency-header">
+              <h4>이후에 해야 하는 일정</h4>
+            </div>
+            {nextTasks.length === 0 ? (
+              <p className="schedule-form__dependency-empty">연결된 이후 일정이 없습니다.</p>
+            ) : (
+              <div className="schedule-form__dependency-tags">
+                {nextTasks.map((task) => (
+                  <span key={task.id} className="schedule-form__tag is-next">
+                    {task.title}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </section>
       <footer className="schedule-detail__actions">
         <button type="button" disabled={!scheduleActions.canStart || scheduleActions.isMutating} onClick={scheduleActions.start}>

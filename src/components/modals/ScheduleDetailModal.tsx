@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../context/ToastContext'
 import { formatDateTimeWithZone } from '../../utils/datetime'
 import { getImportanceStyle, getUrgencyStyle } from '../../utils/priorityStyles.ts'
+import type { ScheduleSummary } from '../../types/schedule'
 import './ScheduleDetailModal.css'
+import '../schedules/ScheduleForm.css'
 
 type ScheduleDetailModalProps = {
   scheduleId: number
@@ -57,6 +59,8 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
   const deadline = formatDateTimeWithZone(schedule.deadline)
   const importanceStyle = getImportanceStyle(schedule.importance)
   const urgencyStyle = getUrgencyStyle(schedule.urgency)
+  const previousTasks: ScheduleSummary[] = schedule.previousTasks ?? []
+  const nextTasks: ScheduleSummary[] = schedule.nextTasks ?? []
 
   return (
     <div className="schedule-detail-modal__backdrop" onClick={onClose}>
@@ -99,6 +103,44 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
               <br />
               마감: {deadline}
             </p>
+          </section>
+
+          <section className="schedule-detail-modal__section">
+            <h3>이전/이후 일정</h3>
+            <div className="schedule-form__dependency-groups">
+              <div className="schedule-form__dependency-column">
+                <div className="schedule-form__dependency-header">
+                  <h4>이전에 해야 하는 일정</h4>
+                </div>
+                {previousTasks.length === 0 ? (
+                  <p className="schedule-form__dependency-empty">연결된 이전 일정이 없습니다.</p>
+                ) : (
+                  <div className="schedule-form__dependency-tags">
+                    {previousTasks.map((task) => (
+                      <span key={task.id} className="schedule-form__tag">
+                        {task.title}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="schedule-form__dependency-column">
+                <div className="schedule-form__dependency-header">
+                  <h4>이후에 해야 하는 일정</h4>
+                </div>
+                {nextTasks.length === 0 ? (
+                  <p className="schedule-form__dependency-empty">연결된 이후 일정이 없습니다.</p>
+                ) : (
+                  <div className="schedule-form__dependency-tags">
+                    {nextTasks.map((task) => (
+                      <span key={task.id} className="schedule-form__tag is-next">
+                        {task.title}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </section>
 
           <footer className="schedule-detail-modal__actions">

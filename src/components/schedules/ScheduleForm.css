@@ -63,11 +63,63 @@
   flex-wrap: wrap;
 }
 
-.schedule-form__checkbox {
+.schedule-form__dependency-column {
+  flex: 1;
+  min-width: 260px;
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.schedule-form__dependency-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
+}
+
+.schedule-form__dependency-header button {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-weight: 700;
+}
+
+.schedule-form__dependency-empty {
+  margin: 0;
+  color: #94a3b8;
   font-size: 14px;
+}
+
+.schedule-form__dependency-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.schedule-form__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.schedule-form__tag.is-next {
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.schedule-form__tag-remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  font-weight: 800;
 }
 
 .schedule-form__range-field {
