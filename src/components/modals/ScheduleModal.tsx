@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import ScheduleForm from '../schedules/ScheduleForm'
 import { createSchedule, updateSchedule } from '../../api/schedules'
-import { toApiDateTimeKST } from '../../utils/datetime'
+import { toApiDateTimeWithZone, toDateFromApi } from '../../utils/datetime'
 import type { ScheduleFormValues, ScheduleResponse } from '../../types/schedule'
 import { useToast } from '../../context/ToastContext'
 import './ScheduleModal.css'
@@ -30,19 +30,20 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
 
   const handleSubmit = async (values: ScheduleFormValues) => {
     try {
+      const payload = {
+        title: values.title,
+        description: values.description,
+        importance: values.importance,
+        urgency: values.urgency,
+        taskType: values.taskType,
+        date: toApiDateTimeWithZone(values.date),
+        deadline: toApiDateTimeWithZone(values.deadline),
+      }
       let result: ScheduleResponse | null = null
       if (mode === 'create') {
-        result = await createSchedule({
-          ...values,
-          date: toApiDateTimeKST(values.date),
-          deadline: toApiDateTimeKST(values.deadline),
-        })
+        result = await createSchedule(payload)
       } else if (schedule) {
-        result = await updateSchedule(schedule.id, {
-          ...values,
-          date: toApiDateTimeKST(values.date),
-          deadline: toApiDateTimeKST(values.deadline),
-        })
+        result = await updateSchedule(schedule.id, payload)
       }
       if (result) {
         window.dispatchEvent(
@@ -64,8 +65,8 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
     ? {
         title: schedule.title,
         description: schedule.description,
-        date: new Date(schedule.date),
-        deadline: new Date(schedule.deadline),
+        date: toDateFromApi(schedule.date),
+        deadline: toDateFromApi(schedule.deadline),
         importance: schedule.importance,
         urgency: schedule.urgency,
         // taskType은 백엔드에서 제공하지 않으므로 기본값 사용

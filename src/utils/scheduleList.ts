@@ -12,12 +12,20 @@ export const areScheduleListsEqual = (
     const previous = prev[index]
     if (!previous) return false
 
+    const hasSameDate =
+      current.date.dateTime === previous.date.dateTime &&
+      current.date.zoneId === previous.date.zoneId
+    const hasSameDeadline =
+      current.deadline.dateTime === previous.deadline.dateTime &&
+      current.deadline.zoneId === previous.deadline.zoneId
+
     const isSame =
       current.id === previous.id &&
+      current.ownerId === previous.ownerId &&
       current.title === previous.title &&
       current.description === previous.description &&
-      current.date === previous.date &&
-      current.deadline === previous.deadline &&
+      hasSameDate &&
+      hasSameDeadline &&
       current.importance === previous.importance &&
       current.urgency === previous.urgency &&
       current.state === previous.state &&
@@ -30,4 +38,3 @@ export const areScheduleListsEqual = (
 
   return true
 }
-

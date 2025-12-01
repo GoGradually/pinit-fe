@@ -1,3 +1,5 @@
+import type { DateTimeWithZone } from './datetime'
+
 export type ScheduleState =
   | 'NOT_STARTED'   // 미시작 - 시작 버튼만
   | 'IN_PROGRESS'   // 진행 중 - 일시정지, 취소, 완료 버튼
@@ -11,8 +13,8 @@ export type ScheduleResponse = {
   ownerId: number
   title: string
   description: string
-  date: string
-  deadline: string
+  date: DateTimeWithZone
+  deadline: DateTimeWithZone
   importance: number
   urgency: number
   state: ScheduleState
@@ -26,8 +28,8 @@ export type DependencyRequest = {
 export type ScheduleRequest = {
   title: string
   description: string
-  date: string
-  deadline: string
+  date: DateTimeWithZone
+  deadline: DateTimeWithZone
   importance: number
   urgency: number
   taskType: ScheduleTaskType
@@ -49,10 +51,11 @@ export type ScheduleFormValues = {
 
 export type ScheduleSummary = {
   id: number
+  ownerId: number
   title: string
   description: string
-  date: string
-  deadline: string
+  date: DateTimeWithZone
+  deadline: DateTimeWithZone
   importance: number
   urgency: number
   taskType?: ScheduleTaskType // 백엔드에서 제공하지 않을 수 있음

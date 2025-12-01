@@ -1,7 +1,7 @@
-import dayjs from 'dayjs'
 import { useNavigate, useParams } from 'react-router-dom'
 import useScheduleDetail from '../../../hooks/useScheduleDetail.ts'
 import useScheduleActions from '../../../hooks/scheduledetails/useScheduleActions.ts'
+import { formatDateTimeWithZone } from '../../../utils/datetime.ts'
 import './ScheduleDetailPage.css'
 
 const ScheduleDetailPage = () => {
@@ -14,8 +14,8 @@ const ScheduleDetailPage = () => {
     return <p className="schedule-detail__loading">일정 정보를 불러오는 중...</p>
   }
 
-  const startTime = dayjs(schedule.date).format('M월 D일 HH:mm')
-  const deadline = dayjs(schedule.deadline).format('M월 D일 HH:mm')
+  const startTime = formatDateTimeWithZone(schedule.date)
+  const deadline = formatDateTimeWithZone(schedule.deadline)
 
   return (
     <section className="schedule-detail">

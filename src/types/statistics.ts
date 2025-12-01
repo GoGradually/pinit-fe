@@ -1,6 +1,8 @@
+import type { DateTimeWithZone } from './datetime'
+
 export type StatisticsResponse = {
   memberId: number
-  startOfWeek: string
+  startOfWeek: DateTimeWithZone | string
   deepWorkElapsedTime: string
   adminWorkElapsedTime: string
   totalWorkElapsedTime: string

@@ -3,7 +3,7 @@ import type dayjs from 'dayjs'
 
 import { fetchWeeklyStatistics } from '../api/statistics'
 import { toWeeklyStatisticsView } from '../utils/statisticsTransform'
-import { getTodayKST, toApiDateTimeKST } from '../utils/datetime'
+import { getTodayKST, toApiDateTimeWithZone } from '../utils/datetime'
 import type { WeeklyStatisticsView } from '../types/statistics'
 import { MEMBER_ID } from '../constants/member'
 
@@ -28,9 +28,9 @@ const useWeeklyStatistics = (options: Options = {}): UseWeeklyStatisticsReturn =
   const [error, setError] = useState<string | null>(null)
   const { weekStart, memberId = MEMBER_ID } = options
   const timeBase = useMemo(() => weekStart ?? getTodayKST(), [weekStart])
-  const timeParam = useMemo(() => toApiDateTimeKST(timeBase), [timeBase])
+  const timeParam = useMemo(() => toApiDateTimeWithZone(timeBase), [timeBase])
   const previousTimeParam = useMemo(
-    () => toApiDateTimeKST(timeBase.subtract(7, 'day')),
+    () => toApiDateTimeWithZone(timeBase.subtract(7, 'day')),
     [timeBase],
   )
 

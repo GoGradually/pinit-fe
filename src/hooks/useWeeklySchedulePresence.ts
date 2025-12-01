@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type dayjs from 'dayjs'
-import { getWeekDays, toApiDateTimeKST, toDateKey } from '../utils/datetime'
+import { getWeekDays, toApiDateTimeWithZone, toDateKey } from '../utils/datetime'
 import type { DateSchedulePresence } from '../types/schedule'
 import type { ScheduleResponse } from '../types/schedule'
 import { fetchWeeklySchedules } from '../api/schedules'
@@ -37,7 +37,7 @@ const useWeeklySchedulePresence = ({ weekStart, anchorDate }: Options): UseWeekl
         // 주간 일정을 한 번에 조회
         const base = anchorDate ?? weekStart
         // 주간 API가 주 내부 시각을 기대하므로 정오로 이동해 경계 문제 방지
-        const time = toApiDateTimeKST(base.hour(12))
+        const time = toApiDateTimeWithZone(base.hour(12))
         const schedules = await fetchWeeklySchedules(time)
         if (!isMounted) return
         setWeeklySchedules(schedules)
@@ -45,10 +45,7 @@ const useWeeklySchedulePresence = ({ weekStart, anchorDate }: Options): UseWeekl
         // 날짜별로 일정 그룹화
         const schedulesByDate = schedules.reduce<Record<string, ScheduleResponse[]>>(
           (acc, schedule) => {
-            const dateKey =
-              typeof schedule.date === 'string' && schedule.date.length >= 10
-                ? schedule.date.slice(0, 10)
-                : toDateKey(schedule.date)
+            const dateKey = toDateKey(schedule.date)
             if (!acc[dateKey]) {
               acc[dateKey] = []
             }

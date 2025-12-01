@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import type { OverdueSummary, ScheduleResponse } from '../types/schedule'
 import { fetchWeeklySchedules } from '../api/schedules'
-import { getTodayKST, toDateKey } from '../utils/datetime'
+import { getTodayKST, toApiDateTimeWithZone, toDateFromApi, toDateKey } from '../utils/datetime'
 
 /**
  * 미완료된 일정 요약 정보를 반환하는 커스텀 훅
@@ -23,7 +23,7 @@ const useOverdueSchedulesSummary = () => {
         const todayKey = toDateKey(today)
 
         // 현재 주의 일정을 조회
-        const time = today.toISOString()
+        const time = toApiDateTimeWithZone(today)
         const schedules = await fetchWeeklySchedules(time)
 
         // 오늘 이전 날짜의 미완료 일정 필터링
@@ -38,7 +38,7 @@ const useOverdueSchedulesSummary = () => {
           if (overdueSchedules.length > 0) {
             // 가장 오래된 일정 찾기
             const earliest = overdueSchedules.reduce((earliest: ScheduleResponse, current: ScheduleResponse) => {
-              return dayjs(current.date).isBefore(dayjs(earliest.date)) ? current : earliest
+              return dayjs(toDateFromApi(current.date)).isBefore(toDateFromApi(earliest.date)) ? current : earliest
             }, overdueSchedules[0])
 
             setSummary({
@@ -77,4 +77,3 @@ const useOverdueSchedulesSummary = () => {
 }
 
 export default useOverdueSchedulesSummary
-

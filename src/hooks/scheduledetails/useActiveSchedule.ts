@@ -25,6 +25,7 @@ const useActiveSchedule = (): ScheduleSummary | null => {
         if (isMounted) {
           setActive({
             id: detail.id,
+            ownerId: detail.ownerId,
             title: detail.title,
             description: detail.description,
             date: detail.date,

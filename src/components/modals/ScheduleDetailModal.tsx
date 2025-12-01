@@ -1,8 +1,8 @@
-import dayjs from 'dayjs'
 import useScheduleDetail from '../../hooks/useScheduleDetail'
 import { deleteSchedule } from '../../api/schedules'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../context/ToastContext'
+import { formatDateTimeWithZone } from '../../utils/datetime'
 import './ScheduleDetailModal.css'
 
 type ScheduleDetailModalProps = {
@@ -52,8 +52,8 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
     )
   }
 
-  const startTime = dayjs(schedule.date).format('M월 D일 HH:mm')
-  const deadline = dayjs(schedule.deadline).format('M월 D일 HH:mm')
+  const startTime = formatDateTimeWithZone(schedule.date)
+  const deadline = formatDateTimeWithZone(schedule.deadline)
 
   return (
     <div className="schedule-detail-modal__backdrop" onClick={onClose}>
