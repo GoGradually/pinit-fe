@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import TopBar from './TopBar'
 import BottomTabBar from './BottomTabBar'
 import MiniPlayerBar from '../schedules/MiniPlayerBar'
+import useDynamicViewportHeight from '../../hooks/useDynamicViewportHeight'
 import './AppShell.css'
 
 const TAB_TITLES: Record<string, string> = {
@@ -32,6 +33,7 @@ const getPageTitle = (pathname: string): string => {
  * @constructor
  */
 const AppShell = () => {
+  useDynamicViewportHeight()
   const location = useLocation()
   const navigate = useNavigate()
   const pathname = location.pathname

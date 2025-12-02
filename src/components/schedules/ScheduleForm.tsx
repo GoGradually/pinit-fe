@@ -46,6 +46,10 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
   const [dependencyMeta, setDependencyMeta] = useState<Record<number, { title: string }>>({})
   const [modalMode, setModalMode] = useState<null | 'previous' | 'next'>(null)
 
+  const ensureTouchFocus = (event: React.TouchEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    event.currentTarget.focus({ preventScroll: true })
+  }
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!form.validate()) return
@@ -117,9 +121,12 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
       <label className="schedule-form__field">
         <span>일정 제목</span>
         <input
+          type="text"
           value={form.values.title}
           onChange={(event) => form.onChange('title', event.target.value)}
           placeholder="예: 마케팅 전략 미팅"
+          inputMode="text"
+          onTouchEnd={ensureTouchFocus}
         />
         {form.errors.title && <small>{form.errors.title}</small>}
       </label>
@@ -131,6 +138,8 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
           onChange={(event) => form.onChange('description', event.target.value)}
           placeholder="세부 설명을 입력해 주세요"
           rows={3}
+          inputMode="text"
+          onTouchEnd={ensureTouchFocus}
         />
         {form.errors.description && <small>{form.errors.description}</small>}
       </label>
