@@ -58,7 +58,10 @@
 
 .schedule-detail-modal__body {
   padding: 24px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .schedule-detail-modal__section {
