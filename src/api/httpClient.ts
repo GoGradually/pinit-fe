@@ -41,7 +41,8 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
   console.log(`📡 [${new Date().toISOString()}] API Request:`, {
     method: options.method || 'GET',
     url,
-    body: json || undefined
+    body: json || undefined,
+    hasAuthHeader: !!authHeader
   })
 
   try {
@@ -65,10 +66,15 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
 
     if (!response.ok) {
       let payload: unknown
+      const cloned = response.clone()
       try {
-        payload = await response.json()
+        payload = await cloned.json()
       } catch {
-        payload = await response.text()
+        try {
+          payload = await cloned.text()
+        } catch {
+          payload = null
+        }
       }
       console.error(`❌ API Error:`, { status: response.status, url, payload })
       throw new ApiError(

@@ -5,7 +5,7 @@ export type AuthProvider = 'naver' | 'google'
 
 const AUTH_BASE_URL =
   import.meta.env.VITE_AUTH_BASE_URL ||
-  (import.meta.env.PROD ? 'https://auth.pinit.go-gradually.me' : 'http://localhost:8080')
+  (import.meta.env.PROD ? 'https://auth.pinit.go-gradually.me' : 'http://localhost:8081')
 
 export const getAuthBaseUrl = () => AUTH_BASE_URL
 
