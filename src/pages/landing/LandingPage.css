@@ -4,6 +4,7 @@
   max-width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  touch-action: pan-y;
   background: #f8fafc;
   color: #0f172a;
   padding: 32px 16px 48px;

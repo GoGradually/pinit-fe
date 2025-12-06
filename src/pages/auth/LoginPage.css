@@ -2,6 +2,8 @@
   position: relative;
   min-height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
   display: flex;
   align-items: center;
