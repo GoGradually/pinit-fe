@@ -8,9 +8,13 @@ export const setAuthTokens = (tokens: { accessToken?: string | null; refreshToke
   const { accessToken, refreshToken } = tokens
   if (accessToken) {
     window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+  } else if (accessToken === null) {
+    window.localStorage.removeItem(ACCESS_TOKEN_KEY)
   }
   if (refreshToken) {
     window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  } else if (refreshToken === null) {
+    window.localStorage.removeItem(REFRESH_TOKEN_KEY)
   }
 }
 

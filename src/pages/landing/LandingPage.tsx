@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { getAccessToken } from '../../api/authTokens'
 import './LandingPage.css'
 
 const slides = [
@@ -32,6 +33,14 @@ const slides = [
 
 const LandingPage = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = getAccessToken()
+    if (token) {
+      navigate('/app/schedules', { replace: true })
+    }
+  }, [navigate])
   const goToSlide = (index: number) => setCurrentSlide(index)
   const goPrev = () => setCurrentSlide((prev) => Math.max(prev - 1, 0))
   const goNext = () => setCurrentSlide((prev) => Math.min(prev + 1, slides.length - 1))

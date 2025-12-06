@@ -12,13 +12,11 @@ const ScheduleEditPage = () => {
   const { scheduleId } = useParams()
   const navigate = useNavigate()
   const { addToast } = useToast()
-  const { schedule, isLoading } = useScheduleDetail(scheduleId)
+  const { schedule, isLoading, error } = useScheduleDetail(scheduleId)
 
   const handleClose = useCallback(() => {
     if (window.history.state && window.history.length > 1) {
       navigate(-1)
-    } else if (scheduleId) {
-      navigate(`/app/schedules/${scheduleId}`)
     } else {
       navigate('/app/schedules')
     }
@@ -26,10 +24,10 @@ const ScheduleEditPage = () => {
 
   useEffect(() => {
     if (!schedule && !isLoading) {
-      addToast('일정을 불러오지 못했습니다.', 'error')
+      addToast(error ?? '일정을 불러오지 못했습니다.', 'error')
       handleClose()
     }
-  }, [schedule, isLoading, addToast, handleClose])
+  }, [schedule, isLoading, addToast, handleClose, error])
 
   if (!scheduleId) {
     handleClose()

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useWeeklyStatistics from '../../hooks/useWeeklyStatistics.ts'
 import StatisticCard from '../../components/statistics/StatisticCard.tsx'
 import DonutChart from '../../components/statistics/DonutChart.tsx'
@@ -14,6 +14,12 @@ const StatisticsTabPage = () => {
   const [anchorDay, setAnchorDay] = useState(today)
   const { current: stats, previous, isLoading, error, refetch } = useWeeklyStatistics({ weekStart: anchorDay })
   const { addToast } = useToast()
+
+  useEffect(() => {
+    if (error) {
+      addToast(error, 'error')
+    }
+  }, [error, addToast])
 
   const goPrevWeek = () => setAnchorDay((prev) => prev.subtract(7, 'day'))
   const goNextWeek = () => {
@@ -44,9 +50,6 @@ const StatisticsTabPage = () => {
   }
 
   if (error || !stats) {
-    if (error) {
-      addToast(error, 'error')
-    }
     return (
       <StatusPanel
         variant="error"

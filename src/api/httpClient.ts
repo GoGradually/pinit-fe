@@ -1,4 +1,4 @@
-import { getAccessToken } from './authTokens'
+import { getAccessToken, getRefreshToken, setAuthTokens } from './authTokens'
 
 const API_BASE_URL =
   import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL
@@ -6,6 +6,15 @@ const API_BASE_URL =
     : import.meta.env.PROD
       ? 'https://api.pinit.go-gradually.me'
       : 'http://localhost:8080'
+
+const AUTH_BASE_URL =
+  import.meta.env.VITE_AUTH_BASE_URL ||
+  (import.meta.env.PROD ? 'https://auth.pinit.go-gradually.me' : 'http://localhost:8081')
+
+let refreshInFlight: Promise<string | null> | null = null
+let lastRefreshAttempt = 0
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // 앱 시작 시 설정 확인
 console.log('🔌 API Configuration:', {
@@ -35,7 +44,67 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
   const { json, headers, credentials, ...rest } = options
   const url = path.startsWith('http') ? path : `${API_BASE_URL}${path}`
   const accessToken = getAccessToken()
+  const refreshToken = getRefreshToken()
   const authHeader = accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+  const body = json ? JSON.stringify(json) : undefined
+
+  const performFetch = async (token?: string) => {
+    const nextAuth = token ? { Authorization: `Bearer ${token}` } : authHeader
+    return fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...nextAuth,
+        ...headers,
+      },
+      body,
+      credentials: credentials || 'include',
+      ...rest,
+    })
+  }
+
+  const tryRefreshToken = async () => {
+    if (refreshInFlight) return refreshInFlight
+
+    const now = Date.now()
+    const elapsed = now - lastRefreshAttempt
+    const waitMs = elapsed >= 1000 ? 0 : 1000 - elapsed
+
+    refreshInFlight = (async () => {
+      if (waitMs > 0) {
+        await sleep(waitMs)
+      }
+      lastRefreshAttempt = Date.now()
+      try {
+        const refreshUrl = `${AUTH_BASE_URL}/refresh`
+        console.log('🔄 Attempting token refresh...')
+        const response = await fetch(refreshUrl, {
+          method: 'POST',
+          credentials: 'include',
+        })
+        if (!response.ok) {
+          console.warn('⚠️ Refresh request failed:', { status: response.status })
+          return null
+        }
+        const data = await response.json() as { token?: string | null; refreshToken?: string | null }
+        const nextAccess = data?.token ?? null
+        const nextRefresh = data?.refreshToken ?? null
+        setAuthTokens({ accessToken: nextAccess, refreshToken: nextRefresh })
+        if (nextAccess) {
+          console.log('✅ Token refreshed successfully')
+          return nextAccess
+        }
+        console.warn('⚠️ Refresh response missing access token')
+        return null
+      } catch (error) {
+        console.error('🔥 Refresh request errored:', error)
+        return null
+      } finally {
+        refreshInFlight = null
+      }
+    })()
+
+    return refreshInFlight
+  }
 
   // 요청 로깅
   console.log(`📡 [${new Date().toISOString()}] API Request:`, {
@@ -46,16 +115,17 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
   })
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader,
-        ...headers,
-      },
-      body: json ? JSON.stringify(json) : undefined,
-      credentials: credentials || 'include',
-      ...rest,
-    })
+    let response = await performFetch()
+
+    // 401일 때 refresh 토큰이 있으면 /refresh 요청 후 한 번만 재시도
+    if (response.status === 401) {
+      // 서버에서 거부한 액세스 토큰은 바로 제거
+      setAuthTokens({ accessToken: null, refreshToken })
+      const refreshed = await tryRefreshToken()
+      if (refreshed) {
+        response = await performFetch(refreshed)
+      }
+    }
 
     // 응답 로깅
     console.log(`📥 [${new Date().toISOString()}] API Response:`, {
@@ -99,6 +169,12 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
     return data
   } catch (error) {
     if (error instanceof ApiError) {
+      console.error('🔥 API Error caught:', {
+        message: error.message,
+        status: error.status,
+        url: error.url,
+        data: error.data,
+      })
       throw error
     }
     console.error(`🔥 Network Error:`, { url, error })

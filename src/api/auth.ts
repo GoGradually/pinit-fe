@@ -46,3 +46,20 @@ export const exchangeSocialLogin = async (provider: AuthProvider, payload: Socia
 
   return response
 }
+
+export const refreshAccessToken = async () => {
+  const url = `${AUTH_BASE_URL}/refresh`
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+  })
+  if (!response.ok) {
+    throw new Error(`토큰 재발급 실패: ${response.status}`)
+  }
+  const data: LoginResponse = await response.json()
+  setAuthTokens({
+    accessToken: data?.token ?? null,
+    refreshToken: data?.refreshToken ?? null,
+  })
+  return data
+}

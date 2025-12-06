@@ -1,7 +1,10 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import TopBar from './TopBar'
 import BottomTabBar from './BottomTabBar'
 import MiniPlayerBar from '../schedules/MiniPlayerBar'
+import { refreshAccessToken } from '../../api/auth'
+import { getAccessToken } from '../../api/authTokens'
 import './AppShell.css'
 
 const TAB_TITLES: Record<string, string> = {
@@ -35,6 +38,22 @@ const AppShell = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const pathname = location.pathname
+  const didAttemptRefresh = useRef(false)
+
+  useEffect(() => {
+    const ensureToken = async () => {
+      if (didAttemptRefresh.current) return
+      didAttemptRefresh.current = true
+      const accessToken = getAccessToken()
+      if (accessToken) return
+      try {
+        await refreshAccessToken()
+      } catch (error) {
+        console.warn('⚠️ 자동 토큰 재발급 실패:', error)
+      }
+    }
+    ensureToken()
+  }, [])
 
   const title = getPageTitle(pathname)
   const showSettingsButton = pathname !== '/app/settings'

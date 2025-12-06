@@ -5,13 +5,11 @@ import useScheduleDetail from '../../hooks/useScheduleDetail.ts'
 const ScheduleEditModal = () => {
   const { scheduleId } = useParams()
   const navigate = useNavigate()
-  const { schedule, isLoading } = useScheduleDetail(scheduleId)
+  const { schedule, isLoading, error } = useScheduleDetail(scheduleId)
 
   const handleClose = () => {
     if (window.history.state && window.history.length > 1) {
       navigate(-1)
-    } else if (scheduleId) {
-      navigate(`/app/schedules/${scheduleId}`)
     } else {
       navigate('/app/schedules')
     }
@@ -22,12 +20,28 @@ const ScheduleEditModal = () => {
     return null
   }
 
-  if (isLoading || !schedule) {
+  if (isLoading) {
     return (
       <div className="schedule-modal__backdrop" onClick={handleClose}>
         <div className="schedule-modal__content" onClick={(e) => e.stopPropagation()}>
           <div className="schedule-modal__body">
             <p>일정 정보를 불러오는 중...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !schedule) {
+    return (
+      <div className="schedule-modal__backdrop" onClick={handleClose}>
+        <div className="schedule-modal__content" onClick={(e) => e.stopPropagation()}>
+          <div className="schedule-modal__body">
+            <p>일정 정보를 불러오지 못했어요.</p>
+            <p>{error}</p>
+            <button type="button" onClick={handleClose}>
+              닫기
+            </button>
           </div>
         </div>
       </div>

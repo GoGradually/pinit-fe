@@ -23,7 +23,7 @@ type ScheduleDetailModalProps = {
  * @constructor
  */
 const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailModalProps) => {
-  const { schedule, isLoading } = useScheduleDetail(scheduleId.toString())
+  const { schedule, isLoading, error } = useScheduleDetail(scheduleId.toString())
   const navigate = useNavigate()
   const { addToast } = useToast()
 
@@ -46,11 +46,32 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
     }
   }
 
-  if (isLoading || !schedule) {
+  if (isLoading) {
     return (
       <div className="schedule-detail-modal__backdrop" onClick={onClose}>
         <div className="schedule-detail-modal__content" onClick={(e) => e.stopPropagation()}>
           <p className="schedule-detail-modal__loading">일정 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !schedule) {
+    return (
+      <div className="schedule-detail-modal__backdrop" onClick={onClose}>
+        <div className="schedule-detail-modal__content" onClick={(e) => e.stopPropagation()}>
+          <p className="schedule-detail-modal__loading">일정 정보를 불러오지 못했어요.</p>
+          <p className="schedule-detail-modal__description">{error}</p>
+          <button
+            type="button"
+            className="schedule-detail-modal__action-btn schedule-detail-modal__action-btn--delete"
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+          >
+            닫기
+          </button>
         </div>
       </div>
     )
