@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signup } from '../../api/auth'
@@ -25,6 +25,19 @@ const SignupPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { addToast } = useToast()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const body = document.body
+    const root = document.getElementById('root')
+    const prevBodyOverflow = body.style.overflow
+    const prevRootOverflow = root?.style.overflow
+    body.style.overflow = 'auto'
+    if (root) root.style.overflow = 'auto'
+    return () => {
+      body.style.overflow = prevBodyOverflow
+      if (root && prevRootOverflow !== undefined) root.style.overflow = prevRootOverflow
+    }
+  }, [])
 
   const onChange = <K extends keyof SignupFormState>(key: K, value: SignupFormState[K]) => {
     setValues((prev) => ({ ...prev, [key]: value }))

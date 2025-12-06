@@ -5,6 +5,7 @@ import { buildAuthorizeUrl, login, type AuthProvider } from '../../api/auth'
 import { clearLogoutMarker } from '../../api/authTokens'
 import { useToast } from '../../context/ToastContext'
 import './LoginPage.css'
+import { useEffect } from 'react'
 
 const LoginPage = () => {
   const [activeProvider, setActiveProvider] = useState<AuthProvider | null>(null)
@@ -13,6 +14,19 @@ const LoginPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { addToast } = useToast()
+
+  useEffect(() => {
+    const body = document.body
+    const root = document.getElementById('root')
+    const prevBodyOverflow = body.style.overflow
+    const prevRootOverflow = root?.style.overflow
+    body.style.overflow = 'auto'
+    if (root) root.style.overflow = 'auto'
+    return () => {
+      body.style.overflow = prevBodyOverflow
+      if (root && prevRootOverflow !== undefined) root.style.overflow = prevRootOverflow
+    }
+  }, [])
 
   const validate = () => {
     const nextErrors: Partial<Record<'username' | 'password', string>> = {}
