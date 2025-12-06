@@ -24,7 +24,8 @@ body,
 
 body {
   background-color: #f1f5f9;
-  overflow: hidden; /* Prevent body scroll to avoid unintended horizontal movement */
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 a,
@@ -32,6 +33,7 @@ button,
 input,
 textarea {
   font: inherit;
+  touch-action: manipulation;
 }
 
 button {

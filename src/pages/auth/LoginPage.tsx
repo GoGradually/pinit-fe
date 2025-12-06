@@ -14,10 +14,20 @@ const LoginPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { addToast } = useToast()
-  const handleTouchFocus = (event: React.TouchEvent<HTMLInputElement>) => {
+  const isStandalone = () =>
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    (window.navigator as unknown as { standalone?: boolean })?.standalone === true
+
+  const handleTouchFocus = (event: React.TouchEvent<HTMLInputElement> | React.MouseEvent<HTMLInputElement>) => {
     const target = event.currentTarget
-    // iOS PWA에서 포커스가 씹히는 문제를 방지
-    setTimeout(() => target.focus({ preventScroll: true }), 0)
+    if (!isStandalone()) return
+    // PWA standalone 모드에서 포커스가 씹히는 문제를 방지
+    requestAnimationFrame(() => {
+      target.focus({ preventScroll: false })
+      setTimeout(() => {
+        target.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      }, 50)
+    })
   }
 
   useEffect(() => {
@@ -107,6 +117,7 @@ const LoginPage = () => {
               placeholder="아이디를 입력하세요"
               autoComplete="username"
               onTouchEnd={handleTouchFocus}
+              onMouseDown={handleTouchFocus}
               disabled={isSubmitting || !!activeProvider}
             />
             {errors.username && <small>{errors.username}</small>}
@@ -121,6 +132,7 @@ const LoginPage = () => {
               placeholder="비밀번호를 입력하세요"
               autoComplete="current-password"
               onTouchEnd={handleTouchFocus}
+              onMouseDown={handleTouchFocus}
               disabled={isSubmitting || !!activeProvider}
             />
             {errors.password && <small>{errors.password}</small>}
