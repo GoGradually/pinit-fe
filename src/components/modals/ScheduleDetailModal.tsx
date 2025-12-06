@@ -6,6 +6,7 @@ import { formatDateTimeWithZone } from '../../utils/datetime'
 import { formatDurationLabel } from '../../utils/duration'
 import { getImportanceStyle, getUrgencyStyle } from '../../utils/priorityStyles.ts'
 import type { ScheduleSummary } from '../../types/schedule'
+import { useScheduleCache } from '../../context/ScheduleCacheContext'
 import './ScheduleDetailModal.css'
 import '../schedules/ScheduleForm.css'
 
@@ -26,6 +27,7 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
   const { schedule, isLoading, error } = useScheduleDetail(scheduleId.toString())
   const navigate = useNavigate()
   const { addToast } = useToast()
+  const { activeScheduleId, setActiveSchedule } = useScheduleCache()
 
   const handleDelete = async () => {
     if (!schedule) return
@@ -34,6 +36,9 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
       try {
         await deleteSchedule(schedule.id)
         console.log(`✅ Schedule deleted: ${schedule.id}`)
+        if (activeScheduleId === schedule.id) {
+          setActiveSchedule(null)
+        }
         onClose()
         addToast('일정이 삭제되었습니다.', 'success')
         if (onRefresh) {

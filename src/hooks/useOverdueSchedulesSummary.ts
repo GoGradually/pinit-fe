@@ -69,6 +69,12 @@ const useOverdueSchedulesSummary = () => {
     }
   }, [timestamp])
 
+  useEffect(() => {
+    const handleScheduleChanged = () => setTimestamp(Date.now())
+    window.addEventListener('schedule:changed', handleScheduleChanged)
+    return () => window.removeEventListener('schedule:changed', handleScheduleChanged)
+  }, [])
+
   return {
     summary,
     isLoading,

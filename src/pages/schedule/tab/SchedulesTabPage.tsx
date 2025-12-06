@@ -107,7 +107,6 @@ const SchedulesTabPage = () => {
 
   const handleRefresh = () => {
     console.log('🔄 Manual refresh triggered')
-    refetchPresence()
     refetchOverdue()
     refetchSchedules()
     refetchWeeklyStats()
@@ -122,7 +121,7 @@ const SchedulesTabPage = () => {
         setActiveSchedule(null)
       }
       refetchSchedules()
-      refetchPresence()
+      refetchOverdue()
     } catch (error) {
       console.error(`❌ Delete failed for schedule ${scheduleId}:`, error)
       addToast('일정 삭제에 실패했습니다.', 'error')
@@ -144,7 +143,6 @@ const SchedulesTabPage = () => {
         console.error('⚠️ Failed to cache active schedule detail after start:', error)
       }
       refetchSchedules()
-      refetchPresence()
     } catch (error) {
       console.error(`❌ Start failed for schedule ${scheduleId}:`, error)
       addToast('일정 시작에 실패했습니다.', 'error')
@@ -161,7 +159,6 @@ const SchedulesTabPage = () => {
         setActiveSchedule(null)
       }
       refetchSchedules()
-      refetchPresence()
     } catch (error) {
       console.error(`❌ Cancel failed for schedule ${scheduleId}:`, error)
       addToast('일정 취소에 실패했습니다.', 'error')
@@ -184,7 +181,7 @@ const SchedulesTabPage = () => {
         console.error('⚠️ Failed to refresh schedule detail after complete:', error)
       }
       refetchSchedules()
-      refetchPresence()
+      refetchOverdue()
     } catch (error) {
       console.error(`❌ Complete failed for schedule ${scheduleId}:`, error)
       addToast('일정 완료에 실패했습니다.', 'error')
@@ -307,7 +304,10 @@ const SchedulesTabPage = () => {
         <ScheduleDetailModal
           scheduleId={detailScheduleId}
           onClose={() => setDetailScheduleId(null)}
-          onRefresh={refetchSchedules}
+          onRefresh={() => {
+            refetchSchedules()
+            refetchOverdue()
+          }}
         />
       )}
     </section>
