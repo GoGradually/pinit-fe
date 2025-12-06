@@ -9,8 +9,8 @@ const slides = [
     description:
       '한 손 조작으로 중요도·긴급도를 바로 조정하고, 카드형 보드로 오늘의 흐름을 확인하세요.',
     bullets: ['드래그 없이 슬라이더로 우선순위 설정', '주간 스트립과 카드 뷰로 빠른 스캔', '작은 화면에서도 읽기 쉬운 정보 구조'],
-    ctaLabel: '앱 열어보기',
-    ctaHref: '/app/schedules',
+    ctaLabel: '지금 로그인하기',
+    ctaHref: '/login',
   },
   {
     title: '핵심 기능 한눈에',
@@ -65,9 +65,7 @@ const LandingPage = () => {
           <Link to="/login" className="landing__action landing__action--primary">
             로그인하고 시작하기
           </Link>
-          <Link to="/app/schedules" className="landing__action landing__action--ghost">
-            대시보드 바로가기
-          </Link>
+          <p className="landing__hint">SSO로 1분 안에 로그인하면 바로 일정 보드로 이동해요.</p>
         </div>
         <div className="landing__glow landing__glow--one" />
         <div className="landing__glow landing__glow--two" />

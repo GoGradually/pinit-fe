@@ -17,6 +17,11 @@
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
+.landing__hero > *:not(.landing__glow) {
+  position: relative;
+  z-index: 1;
+}
+
 .landing__badge {
   display: inline-flex;
   align-items: center;
@@ -48,9 +53,10 @@
 
 .landing__actions {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   margin-top: 20px;
-  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .landing__action {
@@ -76,6 +82,12 @@
   background: #f8fafc;
 }
 
+.landing__hint {
+  margin: 0;
+  font-size: 14px;
+  color: #475569;
+}
+
 .landing__action:active {
   transform: translateY(1px);
 }
@@ -85,6 +97,8 @@
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .landing__glow--one {
