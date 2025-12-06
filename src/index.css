@@ -24,7 +24,7 @@ body,
 
 body {
   background-color: #f1f5f9;
-  overflow-y: auto;
+  overflow: hidden; /* Prevent body scroll to avoid unintended horizontal movement */
 }
 
 a,

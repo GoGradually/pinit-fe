@@ -14,14 +14,24 @@ const LoginPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { addToast } = useToast()
+  const handleTouchFocus = (event: React.TouchEvent<HTMLInputElement>) => {
+    const target = event.currentTarget
+    // iOS PWA에서 포커스가 씹히는 문제를 방지
+    setTimeout(() => target.focus({ preventScroll: true }), 0)
+  }
 
   useEffect(() => {
     const body = document.body
     const root = document.getElementById('root')
     const prevBodyOverflow = body.style.overflow
     const prevRootOverflow = root?.style.overflow
-    body.style.overflow = 'auto'
-    if (root) root.style.overflow = 'auto'
+    // Allow vertical scrolling within auth page without enabling horizontal body scroll
+    body.style.overflowX = 'hidden'
+    body.style.overflowY = 'auto'
+    if (root) {
+      root.style.overflowX = 'hidden'
+      root.style.overflowY = 'auto'
+    }
     return () => {
       body.style.overflow = prevBodyOverflow
       if (root && prevRootOverflow !== undefined) root.style.overflow = prevRootOverflow
@@ -96,6 +106,7 @@ const LoginPage = () => {
               onChange={(event) => setCredentials((prev) => ({ ...prev, username: event.target.value }))}
               placeholder="아이디를 입력하세요"
               autoComplete="username"
+              onTouchEnd={handleTouchFocus}
               disabled={isSubmitting || !!activeProvider}
             />
             {errors.username && <small>{errors.username}</small>}
@@ -109,6 +120,7 @@ const LoginPage = () => {
               onChange={(event) => setCredentials((prev) => ({ ...prev, password: event.target.value }))}
               placeholder="비밀번호를 입력하세요"
               autoComplete="current-password"
+              onTouchEnd={handleTouchFocus}
               disabled={isSubmitting || !!activeProvider}
             />
             {errors.password && <small>{errors.password}</small>}

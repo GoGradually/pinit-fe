@@ -25,14 +25,22 @@ const SignupPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { addToast } = useToast()
   const navigate = useNavigate()
+  const handleTouchFocus = (event: React.TouchEvent<HTMLInputElement>) => {
+    const target = event.currentTarget
+    setTimeout(() => target.focus({ preventScroll: true }), 0)
+  }
 
   useEffect(() => {
     const body = document.body
     const root = document.getElementById('root')
     const prevBodyOverflow = body.style.overflow
     const prevRootOverflow = root?.style.overflow
-    body.style.overflow = 'auto'
-    if (root) root.style.overflow = 'auto'
+    body.style.overflowX = 'hidden'
+    body.style.overflowY = 'auto'
+    if (root) {
+      root.style.overflowX = 'hidden'
+      root.style.overflowY = 'auto'
+    }
     return () => {
       body.style.overflow = prevBodyOverflow
       if (root && prevRootOverflow !== undefined) root.style.overflow = prevRootOverflow
@@ -111,6 +119,7 @@ const SignupPage = () => {
               onChange={(event) => onChange('username', event.target.value)}
               placeholder="아이디를 입력하세요"
               autoComplete="username"
+              onTouchEnd={handleTouchFocus}
               required
             />
             {errors.username && <small>{errors.username}</small>}
@@ -124,6 +133,7 @@ const SignupPage = () => {
               onChange={(event) => onChange('password', event.target.value)}
               placeholder="8자 이상 입력하세요"
               autoComplete="new-password"
+              onTouchEnd={handleTouchFocus}
               required
             />
             {errors.password && <small>{errors.password}</small>}
@@ -137,6 +147,7 @@ const SignupPage = () => {
               onChange={(event) => onChange('confirmPassword', event.target.value)}
               placeholder="비밀번호를 다시 입력하세요"
               autoComplete="new-password"
+              onTouchEnd={handleTouchFocus}
               required
             />
             {errors.confirmPassword && <small>{errors.confirmPassword}</small>}
@@ -149,6 +160,7 @@ const SignupPage = () => {
               onChange={(event) => onChange('nickname', event.target.value)}
               placeholder="프로필에 표시될 별명"
               autoComplete="nickname"
+              onTouchEnd={handleTouchFocus}
               required
             />
             {errors.nickname && <small>{errors.nickname}</small>}
