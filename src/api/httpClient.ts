@@ -160,7 +160,17 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
       return undefined as T
     }
 
-    const data = (await response.json()) as T
+    const rawBody = await response.text()
+    if (!rawBody) {
+      console.log(`✅ Success (Empty Body):`, url)
+      return undefined as T
+    }
+
+    const contentType = response.headers.get('content-type') || ''
+    const data = contentType.includes('application/json')
+      ? (JSON.parse(rawBody) as T)
+      : (rawBody as unknown as T)
+
     console.log(`✅ Success:`, {
       url,
       dataType: Array.isArray(data) ? `Array[${data.length}]` : typeof data,
