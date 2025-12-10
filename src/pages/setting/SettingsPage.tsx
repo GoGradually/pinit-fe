@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { clearAuthTokens, markLoggedOut } from '../../api/authTokens'
 import { useToast } from '../../context/ToastContext'
+import usePushSubscription from '../../hooks/usePushSubscription'
 import './SettingsPage.css'
 
 const SettingsPage = () => {
@@ -10,12 +11,58 @@ const SettingsPage = () => {
   const [isAutoStatsEnabled, setIsAutoStatsEnabled] = useState(true)
   const navigate = useNavigate()
   const { addToast } = useToast()
+  const {
+    state: pushState,
+    isProcessing: isPushProcessing,
+    describeStatus: pushDescription,
+    subscribe: subscribePush,
+  } = usePushSubscription()
 
   const handleLogout = () => {
     clearAuthTokens()
     markLoggedOut()
     addToast('로그아웃되었습니다.', 'info')
     navigate('/login', { replace: true })
+  }
+
+  const pushStatusLabel = (() => {
+    switch (pushState.status) {
+      case 'subscribed':
+        return '활성화'
+      case 'blocked':
+        return '권한 차단'
+      case 'unsupported':
+        return '미지원'
+      case 'error':
+        return '재시도 필요'
+      default:
+        return '대기중'
+    }
+  })()
+
+  const pushBadgeClass = (() => {
+    switch (pushState.status) {
+      case 'subscribed':
+        return 'settings__badge settings__badge--positive'
+      case 'blocked':
+        return 'settings__badge settings__badge--warning'
+      case 'unsupported':
+        return 'settings__badge settings__badge--muted'
+      case 'error':
+        return 'settings__badge settings__badge--error'
+      default:
+        return 'settings__badge'
+    }
+  })()
+
+  const handlePushSubscribe = async () => {
+    try {
+      await subscribePush()
+      addToast('푸시 알림 구독이 완료되었어요.', 'success')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '푸시 알림 설정에 실패했어요.'
+      addToast(message, 'error')
+    }
   }
 
   return (
@@ -52,6 +99,23 @@ const SettingsPage = () => {
           >
             <span />
           </button>
+        </div>
+        <div className="settings__row settings__row--stack">
+          <div>
+            <p className="settings__label">브라우저 푸시 알림</p>
+            <p className="settings__description">{pushDescription}</p>
+          </div>
+          <div className="settings__actions">
+            <span className={pushBadgeClass}>{pushStatusLabel}</span>
+            <button
+              type="button"
+              className="settings__action-btn"
+              disabled={isPushProcessing || pushState.status === 'unsupported'}
+              onClick={handlePushSubscribe}
+            >
+              {pushState.status === 'subscribed' ? '다시 등록' : '알림 허용'}
+            </button>
+          </div>
         </div>
       </section>
 

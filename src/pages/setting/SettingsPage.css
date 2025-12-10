@@ -49,6 +49,10 @@
   padding: 0;
 }
 
+.settings__row--stack {
+  align-items: flex-start;
+}
+
 .settings__row--between {
   align-items: center;
   justify-content: space-between;
@@ -104,6 +108,74 @@
 
 .settings__toggle.is-active span {
   transform: translateX(18px);
+}
+
+.settings__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-size: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.settings__badge--positive {
+  background-color: #ecfdf3;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.settings__badge--warning {
+  background-color: #fff7ed;
+  border-color: #fed7aa;
+  color: #c2410c;
+}
+
+.settings__badge--muted {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.settings__badge--error {
+  background-color: #fef2f2;
+  border-color: #fecdd3;
+  color: #b91c1c;
+}
+
+.settings__action-btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #0f172a;
+  background: #0f172a;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.settings__action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.12);
+}
+
+.settings__action-btn:active {
+  transform: translateY(0);
+}
+
+.settings__action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .settings__card--danger {
