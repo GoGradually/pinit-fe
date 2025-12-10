@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { refreshAccessToken } from '../../api/auth'
-import { clearAuthTokens, getAccessToken, isLoggedOut } from '../../api/authTokens'
+import { clearAuthTokens, getAccessToken, isAccessTokenExpired, isLoggedOut } from '../../api/authTokens'
 
 const AuthGuard = () => {
   const [isReady, setIsReady] = useState(false)
@@ -17,7 +17,8 @@ const AuthGuard = () => {
         return
       }
       const token = getAccessToken()
-      if (token) {
+      const shouldRefresh = !token || isAccessTokenExpired(token)
+      if (!shouldRefresh) {
         setIsReady(true)
         return
       }

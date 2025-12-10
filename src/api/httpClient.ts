@@ -1,4 +1,4 @@
-import { getAccessToken, getRefreshToken, setAuthTokens } from './authTokens'
+import { getAccessToken, setAuthTokens } from './authTokens'
 
 const API_BASE_URL =
   import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL
@@ -44,7 +44,6 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
   const { json, headers, credentials, ...rest } = options
   const url = path.startsWith('http') ? path : `${API_BASE_URL}${path}`
   const accessToken = getAccessToken()
-  const refreshToken = getRefreshToken()
   const authHeader = accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
   const body = json ? JSON.stringify(json) : undefined
 
@@ -87,8 +86,7 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
         }
         const data = await response.json() as { token?: string | null; refreshToken?: string | null }
         const nextAccess = data?.token ?? null
-        const nextRefresh = data?.refreshToken ?? null
-        setAuthTokens({ accessToken: nextAccess, refreshToken: nextRefresh })
+        setAuthTokens({ accessToken: nextAccess })
         if (nextAccess) {
           console.log('✅ Token refreshed successfully')
           return nextAccess
@@ -120,7 +118,7 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
     // 401일 때 refresh 토큰이 있으면 /refresh 요청 후 한 번만 재시도
     if (response.status === 401) {
       // 서버에서 거부한 액세스 토큰은 바로 제거
-      setAuthTokens({ accessToken: null, refreshToken })
+      setAuthTokens({ accessToken: null })
       const refreshed = await tryRefreshToken()
       if (refreshed) {
         response = await performFetch(refreshed)

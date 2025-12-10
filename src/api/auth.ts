@@ -52,7 +52,6 @@ export const exchangeSocialLogin = async (provider: AuthProvider, payload: Socia
 
   setAuthTokens({
     accessToken: response?.token ?? null,
-    refreshToken: response?.refreshToken ?? null,
   })
 
   return response
@@ -68,7 +67,6 @@ export const login = async (payload: LoginPayload) => {
 
   setAuthTokens({
     accessToken: response?.token ?? null,
-    refreshToken: response?.refreshToken ?? null,
   })
 
   return response
@@ -95,7 +93,6 @@ export const refreshAccessToken = async () => {
   const data: LoginResponse = await response.json()
   setAuthTokens({
     accessToken: data?.token ?? null,
-    refreshToken: data?.refreshToken ?? null,
   })
   return data
 }

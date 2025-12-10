@@ -8,17 +8,14 @@ export const setAuthTokens = (tokens: { accessToken?: string | null; refreshToke
   if (!hasWindow()) return
   // 로그인 성공 시 로그아웃 마커 제거
   window.localStorage.removeItem(LOGOUT_MARKER_KEY)
-  const { accessToken, refreshToken } = tokens
+  const { accessToken } = tokens
   if (accessToken) {
     window.localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
   } else if (accessToken === null) {
     window.localStorage.removeItem(ACCESS_TOKEN_KEY)
   }
-  if (refreshToken) {
-    window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
-  } else if (refreshToken === null) {
-    window.localStorage.removeItem(REFRESH_TOKEN_KEY)
-  }
+  // refresh 토큰은 httpOnly 쿠키로만 관리하며, 로컬스토리지에 남아있을 경우 제거
+  window.localStorage.removeItem(REFRESH_TOKEN_KEY)
 }
 
 export const getAccessToken = () => {
@@ -26,9 +23,24 @@ export const getAccessToken = () => {
   return window.localStorage.getItem(ACCESS_TOKEN_KEY)
 }
 
-export const getRefreshToken = () => {
-  if (!hasWindow()) return null
-  return window.localStorage.getItem(REFRESH_TOKEN_KEY)
+const parseJwtPayload = (token: string) => {
+  try {
+    const base64 = token.split('.')[1]
+    if (!base64) return null
+    const normalized = base64.replace(/-/g, '+').replace(/_/g, '/')
+    const json = atob(normalized)
+    return JSON.parse(json) as { exp?: number }
+  } catch {
+    return null
+  }
+}
+
+export const isAccessTokenExpired = (token: string, skewMs = 60_000) => {
+  const payload = parseJwtPayload(token)
+  if (!payload?.exp) return false
+  const now = Date.now()
+  const exp = payload.exp * 1000
+  return exp - skewMs <= now
 }
 
 export const clearAuthTokens = () => {
