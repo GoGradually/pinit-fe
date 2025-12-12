@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { PointerEvent } from 'react'
 import useScheduleViewState from '../../../hooks/useScheduleViewState.ts'
 import WeeklyDateStrip from '../../../components/schedules/WeeklyDateStrip.tsx'
 import OverdueBanner from '../../../components/schedules/OverdueBanner.tsx'
@@ -15,20 +16,38 @@ import {
   cancelSchedule,
   completeSchedule,
   fetchScheduleDetail,
+  updateSchedule,
 } from '../../../api/schedules.ts'
-import type { ScheduleResponse } from '../../../types/schedule'
+import type { ScheduleResponse, ScheduleSummary } from '../../../types/schedule'
 import useWeeklyStatistics from '../../../hooks/useWeeklyStatistics.ts'
 import { formatMinutesToTime } from '../../../utils/statisticsTransform.ts'
 import './SchedulesTabPage.css'
-import '../../../utils/datetime.ts'
+import { SEOUL_TZ, toApiDateTimeWithZone, toDateKey } from '../../../utils/datetime.ts'
 import { useToast } from '../../../context/ToastContext'
 import { useScheduleCache } from '../../../context/ScheduleCacheContext'
-import { useRef } from 'react'
+import type { DateTimeWithZone } from '../../../types/datetime'
+
+const EDGE_GUTTER = 72
+const DRAG_ACTIVATE_DISTANCE = 6
+
+const shiftDateByDay = (value: DateTimeWithZone, offset: 1 | -1) => {
+  const zoneId = value.zoneId || SEOUL_TZ
+  const next = dayjs.tz(value.dateTime, zoneId).add(offset, 'day')
+  return {
+    dateTime: next.format('YYYY-MM-DDTHH:mm:ss'),
+    zoneId,
+  }
+}
 
 const SchedulesTabPage = () => {
   const listRef = useRef<HTMLDivElement | null>(null)
   const pullStartY = useRef<number | null>(null)
   const pullActivated = useRef(false)
+  const dragStateRef = useRef<{ id: number; startX: number; startY: number; moved: boolean } | null>(null)
+  const suppressClickRef = useRef(false)
+  const [draggingScheduleId, setDraggingScheduleId] = useState<number | null>(null)
+  const [edgeTarget, setEdgeTarget] = useState<'prev' | 'next' | null>(null)
+  const [movingScheduleId, setMovingScheduleId] = useState<number | null>(null)
   const [detailScheduleId, setDetailScheduleId] = useState<number | null>(null)
   const [weekDirection, setWeekDirection] = useState<'forward' | 'backward'>('forward')
   const {
@@ -188,6 +207,94 @@ const SchedulesTabPage = () => {
     }
   }
 
+  const handleMoveSchedule = async (schedule: ScheduleSummary, offset: 1 | -1) => {
+    if (movingScheduleId === schedule.id) return
+    const previousDateKey = toDateKey(schedule.date)
+    setMovingScheduleId(schedule.id)
+    try {
+      const nextDate = shiftDateByDay(schedule.date, offset)
+      const nextDeadline = shiftDateByDay(schedule.deadline, offset)
+      const updated = await updateSchedule(schedule.id, {
+        date: toApiDateTimeWithZone(nextDate),
+        deadline: toApiDateTimeWithZone(nextDeadline),
+      })
+      setSchedule(updated)
+      window.dispatchEvent(
+        new CustomEvent('schedule:changed', {
+          detail: { schedule: updated, previousDateKey },
+        }),
+      )
+      refetchSchedules()
+      refetchOverdue()
+      refetchWeeklyStats()
+      addToast(
+        `"${schedule.title}" 일정을 ${offset < 0 ? '전날' : '다음날'}로 이동했어요.`,
+        'success',
+      )
+    } catch (error) {
+      console.error('❌ Failed to move schedule by one day:', error)
+      addToast('일정 날짜를 이동하지 못했어요.', 'error')
+    } finally {
+      setMovingScheduleId(null)
+    }
+  }
+
+  const resetDragState = () => {
+    dragStateRef.current = null
+    setDraggingScheduleId(null)
+    setEdgeTarget(null)
+  }
+
+  const handleDragStart = (event: PointerEvent<HTMLDivElement>, scheduleId: number) => {
+    dragStateRef.current = {
+      id: scheduleId,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+    }
+    suppressClickRef.current = false
+    setDraggingScheduleId(scheduleId)
+    setEdgeTarget(null)
+  }
+
+  const handleDragMove = (event: PointerEvent<HTMLDivElement>) => {
+    const state = dragStateRef.current
+    if (!state) return
+    const deltaX = event.clientX - state.startX
+    const deltaY = event.clientY - state.startY
+    if (!state.moved && Math.abs(deltaX) + Math.abs(deltaY) > DRAG_ACTIVATE_DISTANCE) {
+      state.moved = true
+    }
+    const viewportWidth = window.innerWidth
+    const nextTarget =
+      event.clientX < EDGE_GUTTER
+        ? 'prev'
+        : event.clientX > viewportWidth - EDGE_GUTTER
+          ? 'next'
+          : null
+    setEdgeTarget(nextTarget)
+  }
+
+  const handleDragEnd = (event: PointerEvent<HTMLDivElement>, schedule: ScheduleSummary) => {
+    const state = dragStateRef.current
+    if (!state || state.id !== schedule.id) {
+      resetDragState()
+      return
+    }
+    const target = edgeTarget
+    if (state.moved) {
+      event.preventDefault()
+      suppressClickRef.current = true
+      window.setTimeout(() => {
+        suppressClickRef.current = false
+      }, 300)
+    }
+    resetDragState()
+    if (target) {
+      handleMoveSchedule(schedule, target === 'prev' ? -1 : 1)
+    }
+  }
+
   return (
     <section className="schedules-tab">
       {isOverdueLoading ? (
@@ -269,6 +376,32 @@ const SchedulesTabPage = () => {
           pullActivated.current = false
         }}
       >
+        <div
+          className={[
+            'schedules-tab__edge',
+            'schedules-tab__edge--left',
+            draggingScheduleId ? 'is-visible' : '',
+            edgeTarget === 'prev' ? 'is-active' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          aria-hidden
+        >
+          <span>전날로 이동</span>
+        </div>
+        <div
+          className={[
+            'schedules-tab__edge',
+            'schedules-tab__edge--right',
+            draggingScheduleId ? 'is-visible' : '',
+            edgeTarget === 'next' ? 'is-active' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          aria-hidden
+        >
+          <span>다음날로 이동</span>
+        </div>
         {isPresenceLoading || isScheduleLoading ? (
           <StatusPanel variant="loading" title="일정을 불러오는 중" />
         ) : scheduleError ? (
@@ -280,7 +413,28 @@ const SchedulesTabPage = () => {
           />
         ) : schedules.length ? (
           schedules.map((schedule) => (
-            <div key={schedule.id} className="schedules-tab__item">
+            <div
+              key={schedule.id}
+              className={[
+                'schedules-tab__item',
+                draggingScheduleId === schedule.id ? 'is-dragging' : '',
+                movingScheduleId === schedule.id ? 'is-moving' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onPointerDown={(event) => handleDragStart(event, schedule.id)}
+              onPointerMove={handleDragMove}
+              onPointerUp={(event) => handleDragEnd(event, schedule)}
+              onPointerCancel={() => resetDragState()}
+              onPointerLeave={() => resetDragState()}
+              onClickCapture={(event) => {
+                if (suppressClickRef.current) {
+                  event.stopPropagation()
+                  event.preventDefault()
+                  suppressClickRef.current = false
+                }
+              }}
+            >
               <ScheduleCard
                 schedule={schedule}
                 onOpenDetail={setDetailScheduleId}

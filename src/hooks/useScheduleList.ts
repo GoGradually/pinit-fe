@@ -62,6 +62,21 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
     }
   }, [applySchedules, dateKey, timestamp])
 
+  useEffect(() => {
+    const handleScheduleChanged = (event: Event) => {
+      const detail = (event as CustomEvent<{ schedule?: ScheduleSummary; previousDateKey?: string }>).detail
+      if (!detail) return
+      const nextKey = detail.schedule ? toDateKey(detail.schedule.date) : null
+      const affectedKeys = [detail.previousDateKey, nextKey].filter(Boolean)
+      if (affectedKeys.includes(dateKey)) {
+        setTimestamp(Date.now())
+      }
+    }
+
+    window.addEventListener('schedule:changed', handleScheduleChanged)
+    return () => window.removeEventListener('schedule:changed', handleScheduleChanged)
+  }, [dateKey])
+
   return {
     schedules,
     isLoading,
