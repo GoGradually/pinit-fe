@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { fetchVapidPublicKey, registerPushSubscription } from '../api/notifications'
+import { logFcmTokenOnce } from '../firebase/messaging'
 
 type PushStateStatus = 'idle' | 'subscribed' | 'blocked' | 'unsupported' | 'error'
 
@@ -80,6 +81,7 @@ const usePushSubscription = () => {
       const subscription = await registration.pushManager.getSubscription()
       if (subscription) {
         setState({ status: 'subscribed' })
+        void logFcmTokenOnce(registration)
         return
       }
 
@@ -120,21 +122,28 @@ const usePushSubscription = () => {
       }
 
       const existing = await registration.pushManager.getSubscription()
-      const subscription =
-        existing ||
-        (await (async () => {
-          const { publicKey } = await fetchVapidPublicKey()
-          if (!publicKey) {
-            throw new Error('VAPID 키를 불러오지 못했어요.')
-          }
-          const applicationServerKey = urlBase64ToUint8Array(publicKey)
-          return registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey,
-          })
-        })())
+      let subscription = existing
+      let vapidKey: string | null = null
 
-      await registerPushSubscription(subscription.toJSON())
+      if (!subscription) {
+        const { publicKey } = await fetchVapidPublicKey()
+        if (!publicKey) {
+          throw new Error('VAPID 키를 불러오지 못했어요.')
+        }
+        vapidKey = publicKey
+        const applicationServerKey = urlBase64ToUint8Array(publicKey)
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey,
+        })
+      }
+
+      const fcmToken = await logFcmTokenOnce(registration, vapidKey || undefined)
+      if (!fcmToken) {
+        throw new Error('FCM 토큰을 발급하지 못했어요. 다시 시도해주세요.')
+      }
+
+      await registerPushSubscription(fcmToken)
       setState({ status: 'subscribed' })
       return subscription
     } catch (error) {

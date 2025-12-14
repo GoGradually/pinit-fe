@@ -2,7 +2,7 @@ import { httpClient } from './httpClient'
 
 const NOTIFICATION_BASE_URL =
   import.meta.env.VITE_NOTIFICATION_API_BASE_URL ||
-  (import.meta.env.PROD ? 'https://notification.pinit.go-gradually.me' : 'http://localhost:8093')
+  (import.meta.env.PROD ? 'https://notification.pinit.go-gradually.me' : 'http://localhost:8082')
 
 export const getNotificationBaseUrl = () => NOTIFICATION_BASE_URL
 
@@ -12,14 +12,6 @@ export type VapidPublicKeyResponse = {
 
 export type PushTokenRequest = {
   token: string
-}
-
-const extractTokenFromSubscription = (subscription: PushSubscriptionJSON) => {
-  const token = subscription.endpoint?.split('/')?.pop()
-  if (!token) {
-    throw new Error('푸시 토큰 정보를 찾지 못했어요.')
-  }
-  return token
 }
 
 export const fetchVapidPublicKey = async (): Promise<VapidPublicKeyResponse> => {
@@ -39,5 +31,4 @@ export const unsubscribePushToken = (token: string) =>
     json: { token } satisfies PushTokenRequest,
   })
 
-export const registerPushSubscription = (subscription: PushSubscriptionJSON) =>
-  subscribePushToken(extractTokenFromSubscription(subscription))
+export const registerPushSubscription = (token: string) => subscribePushToken(token)
