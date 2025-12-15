@@ -61,21 +61,30 @@ self.addEventListener('push', (event) => {
     }
   }
 
-  const { scheduleId, scheduleTitle, scheduleStartTime, idempotentKey } = payload
+  const notificationPayload = payload.notification || {}
+  const dataPayload = payload.data || payload
+
+  const { scheduleId, scheduleTitle, scheduleStartTime, idempotentKey } = dataPayload
   const formattedStart = formatStartTime(scheduleStartTime)
 
-  const title = scheduleTitle ? `"${scheduleTitle}" 일정이 시작돼요` : '일정 시작 알림'
-  const body =
-    formattedStart || scheduleStartTime
+  const title = notificationPayload.title
+    ? notificationPayload.title
+    : scheduleTitle
+      ? `"${scheduleTitle}" 일정이 시작돼요`
+      : '일정 시작 알림'
+  const body = notificationPayload.body
+    ? notificationPayload.body
+    : formattedStart || scheduleStartTime
       ? `${formattedStart || scheduleStartTime} 시작 예정이에요.`
       : '일정이 곧 시작돼요.'
 
   const notificationOptions = {
     body,
-    icon: '/icons/pinit-app-logo.png',
+    icon: notificationPayload.icon || '/icons/pinit-app-logo.png',
     badge: '/icons/pinit-app-logo.png',
     tag: idempotentKey || (scheduleId ? `schedule-${scheduleId}` : undefined),
     data: {
+      ...dataPayload,
       url: scheduleId ? `/app/schedules?scheduleId=${scheduleId}` : '/app/schedules',
     },
   }
