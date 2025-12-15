@@ -11,8 +11,29 @@ createRoot(document.getElementById('root')!).render(
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
+    let hasRefreshedForUpdate = false
+
     navigator.serviceWorker
       .register('/sw.js')
+      .then((registration) => {
+        // Trigger an update check when the user revisits.
+        registration.update()
+
+        registration.onupdatefound = () => {
+          const installingWorker = registration.installing
+          if (!installingWorker) return
+
+          installingWorker.addEventListener('statechange', () => {
+            if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // A new service worker is ready; refresh once to activate it on clients.
+              if (!hasRefreshedForUpdate) {
+                hasRefreshedForUpdate = true
+                window.location.reload()
+              }
+            }
+          })
+        }
+      })
       .catch((error) => console.error('Service worker registration failed:', error))
   })
 }
