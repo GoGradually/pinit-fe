@@ -1,4 +1,4 @@
-import { getAccessToken, setAuthTokens } from './authTokens'
+import { getAccessToken, isAccessTokenExpired, setAuthTokens } from './authTokens'
 
 const API_BASE_URL =
   import.meta.env.PROD && import.meta.env.VITE_API_BASE_URL
@@ -43,12 +43,12 @@ export type HttpClientOptions = RequestInit & {
 export const httpClient = async <T>(path: string, options: HttpClientOptions = {}): Promise<T> => {
   const { json, headers, credentials, ...rest } = options
   const url = path.startsWith('http') ? path : `${API_BASE_URL}${path}`
-  const accessToken = getAccessToken()
-  const authHeader = accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+  let accessToken = getAccessToken()
   const body = json ? JSON.stringify(json) : undefined
 
   const performFetch = async (token?: string) => {
-    const nextAuth = token ? { Authorization: `Bearer ${token}` } : authHeader
+    const nextToken = token ?? accessToken
+    const nextAuth = nextToken ? { Authorization: `Bearer ${nextToken}` } : undefined
     return fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -87,6 +87,7 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
         const data = await response.json() as { token?: string | null; refreshToken?: string | null }
         const nextAccess = data?.token ?? null
         setAuthTokens({ accessToken: nextAccess })
+        accessToken = nextAccess
         if (nextAccess) {
           console.log('✅ Token refreshed successfully')
           return nextAccess
@@ -104,12 +105,24 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
     return refreshInFlight
   }
 
+  const ensureValidAccessToken = async () => {
+    if (!accessToken) return null
+    if (!isAccessTokenExpired(accessToken)) return accessToken
+    console.log('⌛ Access token expired, refreshing via cookie')
+    setAuthTokens({ accessToken: null })
+    accessToken = null
+    const refreshed = await tryRefreshToken()
+    return refreshed
+  }
+
+  await ensureValidAccessToken()
+
   // 요청 로깅
   console.log(`📡 [${new Date().toISOString()}] API Request:`, {
     method: options.method || 'GET',
     url,
     body: json || undefined,
-    hasAuthHeader: !!authHeader
+    hasAuthHeader: !!accessToken
   })
 
   try {
@@ -119,6 +132,7 @@ export const httpClient = async <T>(path: string, options: HttpClientOptions = {
     if (response.status === 401) {
       // 서버에서 거부한 액세스 토큰은 바로 제거
       setAuthTokens({ accessToken: null })
+      accessToken = null
       const refreshed = await tryRefreshToken()
       if (refreshed) {
         response = await performFetch(refreshed)
