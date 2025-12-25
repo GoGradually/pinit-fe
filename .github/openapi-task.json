@@ -15,7 +15,7 @@
       "description": "Local"
     },
     {
-      "url": "https://api.pinit.local",
+      "url": "https://api.pinit.go-gradually.me",
       "description": "Production"
     }
   ],
@@ -792,6 +792,39 @@
         }
       }
     },
+    "/zone-offset": {
+      "get": {
+        "tags": [
+          "member-controller"
+        ],
+        "summary": "사용자 시간대 조회",
+        "description": "사용자의 시간대를 조회합니다.",
+        "operationId": "getMemberZoneOffset",
+        "parameters": [
+          {
+            "name": "memberId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/statistics": {
       "get": {
         "tags": [
@@ -1177,6 +1210,10 @@
             "type": "integer",
             "format": "int32",
             "description": "긴급도"
+          },
+          "duration": {
+            "type": "string",
+            "description": "누적 작업 시간"
           },
           "state": {
             "type": "string",
