@@ -4,6 +4,7 @@ import { fetchMemberZoneOffset } from '../api/member'
 import {
   formatOffsetLabel,
   getDisplayOffsetMinutes,
+  getDisplayZoneId,
   parseOffsetString,
   setDisplayOffset,
 } from '../utils/datetime'
@@ -23,6 +24,8 @@ export const TimePreferencesProvider = ({ children }: { children: ReactNode }) =
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requestId, setRequestId] = useState(() => Date.now())
+  const systemOffsetMinutes = useMemo(() => getDisplayOffsetMinutes(), [])
+  const systemZoneId = useMemo(() => getDisplayZoneId(), [])
 
   useEffect(() => {
     setDisplayOffset(offsetMinutes)
@@ -45,7 +48,9 @@ export const TimePreferencesProvider = ({ children }: { children: ReactNode }) =
       } catch (err) {
         if (!isMounted) return
         console.error('Failed to fetch member timezone offset:', err)
-        setError('시간대 정보를 불러오지 못했어요. 기본 시간대를 사용합니다.')
+        setOffsetMinutes(systemOffsetMinutes)
+        setDisplayOffset(systemOffsetMinutes, systemZoneId)
+        setError('시간대 정보를 불러오지 못했어요. 시스템 시간대를 사용합니다.')
       } finally {
         if (isMounted) {
           setIsLoading(false)
