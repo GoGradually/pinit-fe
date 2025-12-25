@@ -13,12 +13,13 @@ dayjs.extend(weekday)
 dayjs.locale('ko')
 
 const DEFAULT_ZONE = 'UTC'
-const hasZoneLookup = () => typeof dayjs.tz !== 'undefined' && typeof dayjs.tz.zone === 'function'
+const getTz = () => (dayjs as unknown as { tz?: { guess?: () => string; zone?: (id: string) => unknown } }).tz
 
 const resolveInitialZone = () => {
   try {
-    const guess = hasZoneLookup() ? dayjs.tz.guess() : DEFAULT_ZONE
-    return hasZoneLookup() && dayjs.tz.zone(guess) ? guess : DEFAULT_ZONE
+    const tz = getTz()
+    const guess = tz?.guess ? tz.guess() : DEFAULT_ZONE
+    return tz?.zone && tz.zone(guess) ? guess : DEFAULT_ZONE
   } catch {
     return DEFAULT_ZONE
   }
@@ -28,7 +29,7 @@ let displayZoneId = resolveInitialZone()
 let displayOffsetMinutes = (() => {
   try {
     const zoned = dayjs().tz(displayZoneId)
-    if (zoned.isValid()) return zoned.utcOffset()
+    if (zoned && zoned.isValid()) return zoned.utcOffset()
   } catch {
     // ignore and fall through
   }
@@ -41,7 +42,8 @@ export const getDisplayOffsetMinutes = () => displayOffsetMinutes
 
 export const setDisplayOffset = (offsetMinutes: number, zoneId?: string) => {
   displayOffsetMinutes = offsetMinutes
-  if (zoneId && hasZoneLookup() && dayjs.tz.zone(zoneId)) {
+  const tz = getTz()
+  if (zoneId && tz?.zone && tz.zone(zoneId)) {
     displayZoneId = zoneId
   } else if (zoneId) {
     displayZoneId = DEFAULT_ZONE
@@ -66,7 +68,8 @@ export const parseOffsetString = (value?: string | null) => {
     return sign === '-' ? -offset : offset
   }
 
-  if (hasZoneLookup() && dayjs.tz.zone(trimmed)) {
+  const tz = getTz()
+  if (tz?.zone && tz.zone(trimmed)) {
     return dayjs().tz(trimmed).utcOffset()
   }
 
@@ -81,7 +84,8 @@ const isDateTimeWithZone = (value: unknown): value is DateTimeWithZone => {
 const normalizeZoneId = (zoneId?: string, fallback = DEFAULT_ZONE) => {
   if (!zoneId) return fallback
   if (zoneId.toUpperCase() === 'UTC') return 'UTC'
-  return hasZoneLookup() && dayjs.tz.zone(zoneId) ? zoneId : fallback
+  const tz = getTz()
+  return tz?.zone && tz.zone(zoneId) ? zoneId : fallback
 }
 
 const toUtcDayjs = (value: dayjs.Dayjs | Date | string | DateTimeWithZone) => {
