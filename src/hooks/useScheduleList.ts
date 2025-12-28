@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import type dayjs from 'dayjs'
 import type { ScheduleSummary } from '../types/schedule'
-import { toDateKey, toUtcDateKey } from '../utils/datetime'
+import { toDateKey } from '../utils/datetime'
 import { fetchScheduleSummaries } from '../api/schedules'
 
 type UseScheduleListReturn = {
@@ -19,7 +19,7 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
   const [timestamp, setTimestamp] = useState(() => Date.now())
 
   const displayDateKey = useMemo(() => toDateKey(selectedDate), [selectedDate])
-  const apiDateKey = useMemo(() => toUtcDateKey(selectedDate), [selectedDate])
+  const apiDateTime = useMemo(() => selectedDate.hour(12), [selectedDate])
 
   const applySchedules = useCallback((next: ScheduleSummary[]) => {
     setSchedules(next)
@@ -42,7 +42,7 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
       setError(null)
 
       try {
-        const response = await fetchScheduleSummaries(apiDateKey)
+        const response = await fetchScheduleSummaries(apiDateTime)
         if (isCancelled) return
         applySchedules(response)
       } catch (error) {
@@ -61,7 +61,7 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
     return () => {
       isCancelled = true
     }
-  }, [apiDateKey, applySchedules, displayDateKey, timestamp])
+  }, [apiDateTime, applySchedules, displayDateKey, timestamp])
 
   useEffect(() => {
     const handleScheduleChanged = (event: Event) => {

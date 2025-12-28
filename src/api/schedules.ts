@@ -1,4 +1,5 @@
 import { httpClient } from './httpClient'
+import type dayjs from 'dayjs'
 import type {
   ScheduleResponse,
   ScheduleRequest,
@@ -6,10 +7,12 @@ import type {
 } from '../types/schedule'
 import { MEMBER_ID } from '../constants/member'
 import type { DateTimeWithZone } from '../types/datetime'
-import { toApiDateTimeWithZone } from '../utils/datetime'
+import { toApiDateTimeWithZone, toLocalDateTimeString } from '../utils/datetime'
 
-export const fetchScheduleSummaries = (date: string) =>
-  httpClient<ScheduleSummary[]>(`/schedules?memberId=${MEMBER_ID}&date=${date}`)
+export const fetchScheduleSummaries = (dateTime: dayjs.Dayjs | DateTimeWithZone | string | Date) => {
+  const dateParam = toLocalDateTimeString(dateTime)
+  return httpClient<ScheduleSummary[]>(`/schedules?memberId=${MEMBER_ID}&date=${dateParam}`)
+}
 
 export const fetchWeeklySchedules = (time: DateTimeWithZone | string | Date) => {
   const timeParam = toApiDateTimeWithZone(time)

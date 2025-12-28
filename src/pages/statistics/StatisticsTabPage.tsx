@@ -13,8 +13,7 @@ import { useTimePreferences } from '../../context/TimePreferencesContext.tsx'
 const StatisticsTabPage = () => {
   const { offsetMinutes } = useTimePreferences()
   const today = useMemo(() => {
-    void offsetMinutes
-    return getTodayWithOffset()
+    return getTodayWithOffset(offsetMinutes)
   }, [offsetMinutes])
   const [anchorOffsetDays, setAnchorOffsetDays] = useState(0)
   const anchorDay = useMemo(() => today.add(anchorOffsetDays, 'day'), [anchorOffsetDays, today])

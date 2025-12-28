@@ -30,8 +30,7 @@ const useWeeklyStatistics = (options: Options = {}): UseWeeklyStatisticsReturn =
   const { weekStart, memberId = MEMBER_ID } = options
   const { offsetMinutes } = useTimePreferences()
   const timeBase = useMemo(() => {
-    void offsetMinutes
-    return weekStart ?? getTodayWithOffset()
+    return weekStart ?? getTodayWithOffset(offsetMinutes)
   }, [offsetMinutes, weekStart])
   const timeParam = useMemo(() => toApiDateTimeWithZone(timeBase), [timeBase])
   const previousTimeParam = useMemo(

@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { getTodayWithOffset } from '../utils/datetime'
 import type { ScheduleFormValues } from '../types/schedule'
+import { useTimePreferences } from '../context/TimePreferencesContext'
 
-const buildDefaultDate = () => getTodayWithOffset().minute(0).second(0)
+const buildDefaultDate = (offsetMinutes: number) => getTodayWithOffset(offsetMinutes).minute(0).second(0)
 
-const createInitialValues = (overrides?: Partial<ScheduleFormValues>): ScheduleFormValues => {
-  const base = buildDefaultDate()
+const createInitialValues = (offsetMinutes: number, overrides?: Partial<ScheduleFormValues>): ScheduleFormValues => {
+  const base = buildDefaultDate(offsetMinutes)
   const defaultValues: ScheduleFormValues = {
     title: '',
     description: '',
@@ -36,7 +37,9 @@ type UseScheduleFormReturn = {
 }
 
 const useScheduleForm = ({ initialValues }: UseScheduleFormOptions = {}): UseScheduleFormReturn => {
-  const [values, setValues] = useState<ScheduleFormValues>(() => createInitialValues(initialValues))
+  const { offsetMinutes } = useTimePreferences()
+  const baseOffset = useMemo(() => Number.isFinite(offsetMinutes) ? offsetMinutes : 0, [offsetMinutes])
+  const [values, setValues] = useState<ScheduleFormValues>(() => createInitialValues(baseOffset, initialValues))
   const [errors, setErrors] = useState<Partial<Record<keyof ScheduleFormValues, string>>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -62,7 +65,7 @@ const useScheduleForm = ({ initialValues }: UseScheduleFormOptions = {}): UseSch
   }
 
   const reset = (nextValues?: Partial<ScheduleFormValues>) => {
-    setValues(createInitialValues(nextValues))
+    setValues(createInitialValues(baseOffset, nextValues))
     setErrors({})
   }
 

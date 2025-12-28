@@ -16,8 +16,22 @@ import SocialCallbackPage from './pages/auth/SocialCallbackPage.tsx'
 import SignupPage from './pages/auth/SignupPage.tsx'
 import AuthGuard from './components/auth/AuthGuard.tsx'
 
+const InitialLoadingScreen = () => {
+  return (
+    <div className="app-loading" role="status" aria-live="polite">
+      <div className="app-loading__spinner" aria-hidden />
+      <p className="app-loading__text">시간대를 불러오는 중이에요</p>
+      <p className="app-loading__subtext">현재 시간대에 맞춰 화면을 준비하고 있어요.</p>
+    </div>
+  )
+}
+
 const AppContent = () => {
-  const { offsetMinutes } = useTimePreferences()
+  const { offsetMinutes, isLoading } = useTimePreferences()
+
+  if (isLoading) {
+    return <InitialLoadingScreen />
+  }
 
   return (
     <ScheduleCacheProvider>

@@ -4,6 +4,7 @@ import { getTodayWithOffset, toDateKey, toDisplayDayjs } from '../../utils/datet
 import type { ScheduleSummary } from '../../types/schedule'
 import './ScheduleModal.css'
 import './ScheduleDependencyModal.css'
+import { useTimePreferences } from '../../context/TimePreferencesContext'
 
 type ScheduleDependencyModalProps = {
   isOpen: boolean
@@ -25,7 +26,8 @@ const ScheduleDependencyModal = ({
   selectedIds,
   onApply,
 }: ScheduleDependencyModalProps) => {
-  const [selectedDateKey, setSelectedDateKey] = useState(() => toDateKey(getTodayWithOffset()))
+  const { offsetMinutes } = useTimePreferences()
+  const [selectedDateKey, setSelectedDateKey] = useState(() => toDateKey(getTodayWithOffset(offsetMinutes)))
   const selectedDate = useMemo(() => toDisplayDayjs(selectedDateKey), [selectedDateKey])
   const [localSelection, setLocalSelection] = useState<number[]>(selectedIds)
   const { schedules, isLoading, error, refetch } = useScheduleList(selectedDate)

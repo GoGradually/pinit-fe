@@ -21,7 +21,7 @@ const TimePreferencesContext = createContext<TimePreferencesContextValue | null>
 
 export const TimePreferencesProvider = ({ children }: { children: ReactNode }) => {
   const [offsetMinutes, setOffsetMinutes] = useState(() => getDisplayOffsetMinutes())
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [requestId, setRequestId] = useState(() => Date.now())
   const systemOffsetMinutes = useMemo(() => getDisplayOffsetMinutes(), [])
@@ -44,6 +44,7 @@ export const TimePreferencesProvider = ({ children }: { children: ReactNode }) =
           throw new Error('Invalid offset format')
         }
         if (!isMounted) return
+        setDisplayOffset(parsed)
         setOffsetMinutes(parsed)
       } catch (err) {
         if (!isMounted) return
@@ -63,7 +64,7 @@ export const TimePreferencesProvider = ({ children }: { children: ReactNode }) =
     return () => {
       isMounted = false
     }
-  }, [requestId])
+  }, [requestId, systemOffsetMinutes, systemZoneId])
 
   const value = useMemo(
     () => ({

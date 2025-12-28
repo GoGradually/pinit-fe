@@ -116,8 +116,9 @@ export const toDisplayDayjs = (value: dayjs.Dayjs | Date | string | DateTimeWith
     : dayjs.utc().utcOffset(safeOffset)
 }
 
-export const getTodayWithOffset = () => {
-  const safeOffset = Number.isFinite(displayOffsetMinutes) ? displayOffsetMinutes : 0
+export const getTodayWithOffset = (offsetOverride?: number) => {
+  const effectiveOffset = Number.isFinite(offsetOverride) ? Number(offsetOverride) : displayOffsetMinutes
+  const safeOffset = Number.isFinite(effectiveOffset) ? effectiveOffset : 0
   return dayjs().utc().utcOffset(safeOffset)
 }
 
@@ -131,6 +132,9 @@ export const toDateKey = (date: dayjs.Dayjs | Date | string | DateTimeWithZone) 
 
 export const toUtcDateKey = (date: dayjs.Dayjs | Date | string | DateTimeWithZone) =>
   toUtcDayjs(date).format('YYYY-MM-DD')
+
+export const toLocalDateTimeString = (value: dayjs.Dayjs | Date | string | DateTimeWithZone) =>
+  toDisplayDayjs(value).format('YYYY-MM-DDTHH:mm:ss')
 
 export const formatDisplayDate = (date: dayjs.Dayjs | Date | string | DateTimeWithZone) =>
   toDisplayDayjs(date).format('M월 D일 (dd)')

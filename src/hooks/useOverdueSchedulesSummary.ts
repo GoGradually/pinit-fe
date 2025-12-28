@@ -21,7 +21,7 @@ const useOverdueSchedulesSummary = () => {
     const fetchSummary = async () => {
       setIsLoading(true)
       try {
-        const today = getTodayWithOffset()
+        const today = getTodayWithOffset(offsetMinutes)
         const todayKey = toDateKey(today)
 
         // 현재 주의 일정을 조회

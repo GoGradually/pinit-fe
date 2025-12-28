@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import dayjs from 'dayjs'
-import { formatDisplayDate, getTodayWithOffset, getWeekStart, toDateKey } from '../utils/datetime'
+import type dayjs from 'dayjs'
+import { getTodayWithOffset, getWeekStart } from '../utils/datetime'
+import { useTimePreferences } from './TimePreferencesContext'
 
 export type ScheduleViewStateValue = {
   currentWeekStart: dayjs.Dayjs
@@ -17,7 +18,16 @@ export type ScheduleViewStateValue = {
 export const ScheduleViewStateContext = createContext<ScheduleViewStateValue | null>(null)
 
 export const ScheduleViewStateProvider = ({ children }: { children: ReactNode }) => {
-  const today = useMemo(() => getTodayWithOffset(), [])
+  const { offsetMinutes } = useTimePreferences()
+  const today = useMemo(() => getTodayWithOffset(offsetMinutes), [offsetMinutes])
+  const toDateKeyWithOffset = useCallback(
+    (date: dayjs.Dayjs) => date.utcOffset(offsetMinutes).format('YYYY-MM-DD'),
+    [offsetMinutes],
+  )
+  const formatLabel = useCallback(
+    (date: dayjs.Dayjs) => date.utcOffset(offsetMinutes).format('M월 D일 (dd)'),
+    [offsetMinutes],
+  )
   const [currentWeekStart, setCurrentWeekStart] = useState(() => getWeekStart(today))
   const [selectedDate, setSelectedDate] = useState(today)
 
@@ -37,22 +47,22 @@ export const ScheduleViewStateProvider = ({ children }: { children: ReactNode })
   }, [])
 
   const resetToToday = useCallback(() => {
-    const nextToday = getTodayWithOffset()
+    const nextToday = getTodayWithOffset(offsetMinutes)
     setSelectedDate(nextToday)
     setCurrentWeekStart(getWeekStart(nextToday))
-  }, [])
+  }, [offsetMinutes])
 
   const value = useMemo(
     () => ({
       currentWeekStart,
       selectedDate,
-      selectedDateLabel: formatDisplayDate(selectedDate),
-      selectedDateKey: toDateKey(selectedDate),
+      selectedDateLabel: formatLabel(selectedDate),
+      selectedDateKey: toDateKeyWithOffset(selectedDate),
       goToWeek,
       selectDate,
       resetToToday,
     }),
-    [currentWeekStart, goToWeek, resetToToday, selectDate, selectedDate],
+    [currentWeekStart, formatLabel, goToWeek, resetToToday, selectDate, selectedDate, toDateKeyWithOffset],
   )
 
   return (
