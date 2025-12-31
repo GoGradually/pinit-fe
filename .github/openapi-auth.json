@@ -26,7 +26,7 @@
     }
   ],
   "paths": {
-    "/signup": {
+    "/v0/signup": {
       "post": {
         "tags": [
           "회원/인증"
@@ -54,7 +54,7 @@
         }
       }
     },
-    "/refresh": {
+    "/v0/refresh": {
       "post": {
         "tags": [
           "회원/인증"
@@ -94,7 +94,7 @@
         }
       }
     },
-    "/logout": {
+    "/v0/logout": {
       "post": {
         "tags": [
           "회원/인증"
@@ -109,7 +109,7 @@
         }
       }
     },
-    "/login": {
+    "/v0/login": {
       "post": {
         "tags": [
           "회원/인증"
@@ -151,7 +151,136 @@
         }
       }
     },
-    "/me": {
+    "/signup": {
+      "post": {
+        "tags": [
+          "회원/인증"
+        ],
+        "summary": "회원가입",
+        "description": "로컬 계정 회원가입을 수행합니다.",
+        "operationId": "signup_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "가입 완료"
+          },
+          "500": {
+            "description": "서버 오류"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/refresh": {
+      "post": {
+        "tags": [
+          "회원/인증"
+        ],
+        "summary": "액세스 토큰 재발급",
+        "description": "refresh_token 쿠키에 담긴 리프레시 토큰만 검증하여 새로운 access/refresh token을 발급합니다. 액세스 토큰이나 다른 값이 들어있을 경우 401을 반환합니다.",
+        "operationId": "refresh_1",
+        "parameters": [
+          {
+            "name": "refresh_token",
+            "in": "cookie",
+            "description": "리프레시 토큰",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "재발급 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "쿠키 없음 또는 토큰 검증 실패",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "회원/인증"
+        ],
+        "summary": "로그아웃",
+        "description": "refresh_token 쿠키를 만료시켜 로그아웃 처리합니다.",
+        "operationId": "logout_1",
+        "responses": {
+          "200": {
+            "description": "로그아웃 성공"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "회원/인증"
+        ],
+        "summary": "아이디/비밀번호 로그인",
+        "description": "username, password를 받아 access token을 반환하고 refresh token은 httpOnly 쿠키로 설정합니다.",
+        "operationId": "login_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "로그인 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "자격 증명 오류 등 서버 오류",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/v0/me": {
       "get": {
         "tags": [
           "회원/인증"
@@ -171,7 +300,7 @@
         ]
       }
     },
-    "/login/oauth2/code/{provider}": {
+    "/v0/login/oauth2/code/{provider}": {
       "get": {
         "tags": [
           "소셜 로그인"
@@ -253,7 +382,7 @@
         }
       }
     },
-    "/login/oauth2/authorize/{provider}": {
+    "/v0/login/oauth2/authorize/{provider}": {
       "get": {
         "tags": [
           "소셜 로그인"
@@ -281,6 +410,141 @@
             "description": "미지원 provider 등 서버 오류"
           }
         }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "회원/인증"
+        ],
+        "summary": "로그인 확인",
+        "description": "Bearer 토큰이 유효한지 확인합니다.",
+        "operationId": "checkLogin_1",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "deprecated": true,
+        "security": [
+          {
+            "bearerAuth": [ ]
+          }
+        ]
+      }
+    },
+    "/login/oauth2/code/{provider}": {
+      "get": {
+        "tags": [
+          "소셜 로그인"
+        ],
+        "summary": "소셜 로그인 콜백",
+        "description": "provider 콜백에서 code/state를 받아 로그인 처리 후 토큰을 반환합니다.",
+        "operationId": "socialLogin_1",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "description": "소셜 로그인 공급자",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "naver"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "description": "OAuth2 인가 코드"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "CSRF 방지용 state"
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "description": "provider 오류 코드"
+          },
+          {
+            "name": "error_description",
+            "in": "query",
+            "description": "provider 오류 상세"
+          },
+          {
+            "name": "socialLoginResult",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SocialLoginResult"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "소셜 로그인 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "provider 오류 응답",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "state 검증 실패, 토큰 교환 실패 등 서버 오류",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/login/oauth2/authorize/{provider}": {
+      "get": {
+        "tags": [
+          "소셜 로그인"
+        ],
+        "summary": "소셜 로그인 인가 요청",
+        "description": "provider에 맞는 인가 URL로 302 리다이렉트합니다.",
+        "operationId": "authorize_1",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "description": "소셜 로그인 공급자",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "naver"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "외부 인가 페이지로 리다이렉트"
+          },
+          "500": {
+            "description": "미지원 provider 등 서버 오류"
+          }
+        },
+        "deprecated": true
       }
     }
   },

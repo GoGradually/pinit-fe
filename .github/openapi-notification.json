@@ -17,7 +17,7 @@
     }
   ],
   "paths": {
-    "/push/unsubscribe": {
+    "/v0/push/unsubscribe": {
       "post": {
         "tags": [
           "푸시 알림"
@@ -45,7 +45,7 @@
         }
       }
     },
-    "/push/subscribe": {
+    "/v0/push/subscribe": {
       "post": {
         "tags": [
           "푸시 알림"
@@ -73,7 +73,65 @@
         }
       }
     },
-    "/push/vapid": {
+    "/push/unsubscribe": {
+      "post": {
+        "tags": [
+          "푸시 알림"
+        ],
+        "summary": "푸시 토큰 구독 해지",
+        "description": "인증된 회원의 등록된 푸시 토큰을 삭제합니다.",
+        "operationId": "unsubscribe_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "구독 해지 완료"
+          },
+          "400": {
+            "description": "토큰이 유효하지 않음"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/push/subscribe": {
+      "post": {
+        "tags": [
+          "푸시 알림"
+        ],
+        "summary": "푸시 토큰 구독 등록",
+        "description": "인증된 회원의 푸시 토큰을 등록합니다.",
+        "operationId": "subscribe_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "구독 등록 완료"
+          },
+          "400": {
+            "description": "토큰이 유효하지 않음"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/v0/push/vapid": {
       "get": {
         "tags": [
           "푸시 알림"
@@ -95,7 +153,7 @@
         }
       }
     },
-    "/push/subscribed": {
+    "/v0/push/subscribed": {
       "get": {
         "tags": [
           "푸시 알림"
@@ -104,15 +162,6 @@
         "description": "인증된 회원이 푸시 알림을 구독 중인지 여부를 반환합니다.",
         "operationId": "isSubscribed",
         "parameters": [
-          {
-            "name": "memberId",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
           {
             "name": "deviceId",
             "in": "query",
@@ -134,6 +183,62 @@
             }
           }
         }
+      }
+    },
+    "/push/vapid": {
+      "get": {
+        "tags": [
+          "푸시 알림"
+        ],
+        "summary": "VAPID 공개키 조회",
+        "description": "웹 푸시 구독에 사용되는 VAPID 공개키를 반환합니다.",
+        "operationId": "getVapidPublicKey_1",
+        "responses": {
+          "200": {
+            "description": "VAPID 공개키",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/push/subscribed": {
+      "get": {
+        "tags": [
+          "푸시 알림"
+        ],
+        "summary": "푸시 구독 상태 조회",
+        "description": "인증된 회원이 푸시 알림을 구독 중인지 여부를 반환합니다.",
+        "operationId": "isSubscribed_1",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "구독 상태 조회 완료",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
       }
     }
   },
