@@ -1,7 +1,8 @@
-import { httpClient } from './httpClient'
 import type { StatisticsResponse } from '../types/statistics'
 import type { DateTimeWithZone } from '../types/datetime'
 import { toApiDateTimeWithZone } from '../utils/datetime'
+import { buildApiUrl } from './config'
+import { httpClient } from './httpClient'
 
 type WeeklyStatisticsParams = {
   memberId: number
@@ -16,5 +17,5 @@ export const fetchWeeklyStatistics = ({ memberId, time }: WeeklyStatisticsParams
     zoneId: timeParam.zoneId,
   })
 
-  return httpClient<StatisticsResponse>(`/statistics?${query.toString()}`)
+  return httpClient<StatisticsResponse>(buildApiUrl(`/statistics?${query.toString()}`))
 }

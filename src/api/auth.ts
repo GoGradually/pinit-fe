@@ -1,11 +1,8 @@
-import { httpClient } from './httpClient'
 import { ensureDeviceId, setAuthTokens } from './authTokens'
+import { AUTH_BASE_URL, buildAuthUrl } from './config'
+import { httpClient } from './httpClient'
 
 export type AuthProvider = 'naver' | 'google'
-
-const AUTH_BASE_URL =
-  import.meta.env.VITE_AUTH_BASE_URL ||
-  (import.meta.env.PROD ? 'https://auth.pinit.go-gradually.me' : 'http://localhost:8081')
 
 export const getAuthBaseUrl = () => AUTH_BASE_URL
 
@@ -34,7 +31,7 @@ export type LoginPayload = {
 }
 
 export const buildAuthorizeUrl = (provider: AuthProvider) =>
-  `${AUTH_BASE_URL}/login/oauth2/authorize/${provider}`
+  buildAuthUrl(`/login/oauth2/authorize/${provider}`)
 
 export const exchangeSocialLogin = async (provider: AuthProvider, payload: SocialLoginPayload) => {
   const query = new URLSearchParams()
@@ -44,7 +41,7 @@ export const exchangeSocialLogin = async (provider: AuthProvider, payload: Socia
   if (payload.error) query.set('error', payload.error)
   if (payload.errorDescription) query.set('error_description', payload.errorDescription)
 
-  const url = `${AUTH_BASE_URL}/login/oauth2/code/${provider}?${query.toString()}`
+  const url = buildAuthUrl(`/login/oauth2/code/${provider}?${query.toString()}`)
   const response = await httpClient<LoginResponse>(url, {
     method: 'GET',
     credentials: 'include',
@@ -59,7 +56,7 @@ export const exchangeSocialLogin = async (provider: AuthProvider, payload: Socia
 }
 
 export const login = async (payload: LoginPayload) => {
-  const url = `${AUTH_BASE_URL}/login`
+  const url = buildAuthUrl('/login')
   const response = await httpClient<LoginResponse>(url, {
     method: 'POST',
     json: payload,
@@ -75,7 +72,7 @@ export const login = async (payload: LoginPayload) => {
 }
 
 export const signup = async (payload: SignupPayload) => {
-  const url = `${AUTH_BASE_URL}/signup`
+  const url = buildAuthUrl('/signup')
   return httpClient<void>(url, {
     method: 'POST',
     json: payload,
@@ -84,7 +81,7 @@ export const signup = async (payload: SignupPayload) => {
 }
 
 export const logout = async () => {
-  const url = `${AUTH_BASE_URL}/logout`
+  const url = buildAuthUrl('/logout')
   await httpClient<void>(url, {
     method: 'POST',
     credentials: 'include',
@@ -93,7 +90,7 @@ export const logout = async () => {
 }
 
 export const refreshAccessToken = async () => {
-  const url = `${AUTH_BASE_URL}/refresh`
+  const url = buildAuthUrl('/refresh')
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
