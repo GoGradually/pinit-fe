@@ -181,15 +181,6 @@ const LoginPage = () => {
             <span className="login__icon">N</span>
             {activeProvider === 'naver' ? '네이버로 이동 중...' : '네이버로 계속하기'}
           </button>
-          <button
-            type="button"
-            className="login__btn login__btn--google"
-            onClick={() => handleProviderLogin('google')}
-            disabled={!!activeProvider}
-          >
-            <span className="login__icon">G</span>
-            {activeProvider === 'google' ? 'Google로 이동 중...' : 'Google로 계속하기'}
-          </button>
         </div>
 
         <p className="login__helper">

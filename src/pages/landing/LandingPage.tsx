@@ -24,9 +24,9 @@ const slides = [
   },
   {
     title: '1분 로그인',
-    description: '네이버와 Google SSO만으로 Pinit을 바로 시작하세요.',
+    description: '네이버 SSO만으로 Pinit을 바로 시작하세요.',
     bullets: ['비밀번호 없이 빠른 접속', '세션 유지로 재로그인 최소화', '모바일 브라우저/앱 모두 지원'],
-    ctaLabel: '네이버/Google로 로그인',
+    ctaLabel: '네이버로 로그인',
     ctaHref: '/login',
   },
 ]

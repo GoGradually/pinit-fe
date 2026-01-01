@@ -4,7 +4,8 @@ import { exchangeSocialLogin, type AuthProvider } from '../../api/auth'
 import './LoginPage.css'
 
 const SocialCallbackPage = () => {
-  const { provider } = useParams<{ provider: AuthProvider }>()
+  const { provider: rawProvider } = useParams<{ provider?: string }>()
+  const provider: AuthProvider | null = rawProvider === 'naver' ? 'naver' : null
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const providerError = useMemo(
