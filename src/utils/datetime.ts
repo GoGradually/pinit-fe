@@ -42,10 +42,11 @@ export const getDisplayOffsetMinutes = () => displayOffsetMinutes
 
 export const setDisplayOffset = (offsetMinutes: number, zoneId?: string) => {
   displayOffsetMinutes = offsetMinutes
-  const tz = getTz()
-  if (zoneId && tz?.zone && tz.zone(zoneId)) {
+  if (zoneId) {
     displayZoneId = zoneId
-  } else if (zoneId) {
+    return
+  }
+  if (!displayZoneId) {
     displayZoneId = DEFAULT_ZONE
   }
 }
@@ -147,10 +148,11 @@ export const formatDateTimeWithZone = (
 export const toApiDateTimeWithZone = (
   value: dayjs.Dayjs | Date | string | DateTimeWithZone,
 ): DateTimeWithZone => {
-  const normalized = toUtcDayjs(value)
+  const normalized = toDisplayDayjs(value)
+  const zoneId = getDisplayZoneId() || DEFAULT_ZONE
   return {
-    dateTime: normalized.format('YYYY-MM-DDTHH:mm:ss[Z]'),
-    zoneId: 'UTC',
+    dateTime: normalized.format('YYYY-MM-DDTHH:mm:ss'),
+    zoneId,
   }
 }
 

@@ -44,7 +44,7 @@ export const TimePreferencesProvider = ({ children }: { children: ReactNode }) =
           throw new Error('Invalid offset format')
         }
         if (!isMounted) return
-        setDisplayOffset(parsed)
+        setDisplayOffset(parsed, rawOffset)
         setOffsetMinutes(parsed)
       } catch (err) {
         if (!isMounted) return
