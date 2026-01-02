@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { getTodayWithOffset } from '../utils/datetime'
 import type { ScheduleFormValues } from '../types/schedule'
 import { useTimePreferences } from '../context/TimePreferencesContext'
+import { DEFAULT_DIFFICULTY, isValidDifficulty } from '../constants/difficulty'
 
 const buildDefaultDate = (offsetMinutes: number) => getTodayWithOffset(offsetMinutes).minute(0).second(0)
 
@@ -14,7 +15,7 @@ const createInitialValues = (offsetMinutes: number, overrides?: Partial<Schedule
     date: base.toDate(),
     deadline: base.add(2, 'hour').toDate(),
     importance: 5,
-    urgency: 5,
+    difficulty: DEFAULT_DIFFICULTY,
     taskType: 'DEEP_WORK',
     previousTaskIds: [],
     nextTaskIds: [],
@@ -53,8 +54,8 @@ const useScheduleForm = ({ initialValues }: UseScheduleFormOptions = {}): UseSch
     if (values.importance < 1 || values.importance > 9) {
       nextErrors.importance = '중요도는 1~9 사이여야 합니다.'
     }
-    if (values.urgency < 1 || values.urgency > 9) {
-      nextErrors.urgency = '긴급도는 1~9 사이여야 합니다.'
+    if (!isValidDifficulty(values.difficulty)) {
+      nextErrors.difficulty = '난이도는 1, 2, 3, 5, 8, 13, 21 중 하나여야 합니다.'
     }
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0

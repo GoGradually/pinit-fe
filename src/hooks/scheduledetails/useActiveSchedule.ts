@@ -31,7 +31,7 @@ const useActiveSchedule = (): ScheduleSummary | null => {
             date: detail.date,
             deadline: detail.deadline,
             importance: detail.importance,
-            urgency: detail.urgency,
+            difficulty: detail.difficulty,
             state: detail.state,
           })
           setSchedule(detail)

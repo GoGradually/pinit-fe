@@ -116,7 +116,7 @@ const SettingsPage = () => {
         <div className="settings__row">
           <div>
             <p className="settings__label">마감 30분 전 알림</p>
-            <p className="settings__description">긴급도가 높은 일정에 우선 적용됩니다.</p>
+            <p className="settings__description">난이도가 높은 일정에 우선 적용됩니다.</p>
           </div>
           <button
             className={['settings__toggle', isDeadlineReminderEnabled && 'is-active'].filter(Boolean).join(' ')}
