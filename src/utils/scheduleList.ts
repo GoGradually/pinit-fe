@@ -27,7 +27,7 @@ export const areScheduleListsEqual = (
       hasSameDate &&
       hasSameDeadline &&
       current.importance === previous.importance &&
-      current.urgency === previous.urgency &&
+      current.difficulty === previous.difficulty &&
       current.state === previous.state &&
       current.taskType === previous.taskType
 

@@ -46,7 +46,7 @@ const ScheduleCreatePage = () => {
         title: values.title,
         description: values.description,
         importance: values.importance,
-        urgency: values.urgency,
+        difficulty: values.difficulty,
         taskType: values.taskType,
         date: toApiDateTimeWithZone(values.date),
         deadline: toApiDateTimeWithZone(values.deadline),
@@ -72,7 +72,7 @@ const ScheduleCreatePage = () => {
         <p className="schedule-form-page__eyebrow">새 일정</p>
         <h1 className="schedule-form-page__title">일정 추가</h1>
         <p className="schedule-form-page__description">
-          제목, 설명, 시간 정보를 입력하면 일정 탭에 바로 반영돼요. 필요한 경우 중요도와 긴급도를 함께
+          제목, 설명, 시간 정보를 입력하면 일정 탭에 바로 반영돼요. 필요한 경우 중요도와 난이도를 함께
           설정해 보세요.
         </p>
       </header>

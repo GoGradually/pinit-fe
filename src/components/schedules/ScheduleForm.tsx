@@ -6,6 +6,7 @@ import type { ScheduleTaskType, ScheduleFormValues, ScheduleSummary } from '../.
 import './ScheduleForm.css'
 import ScheduleDependencyModal from '../modals/ScheduleDependencyModal'
 import { useTimePreferences } from '../../context/TimePreferencesContext'
+import { FIBONACCI_DIFFICULTIES } from '../../constants/difficulty'
 
 type ScheduleFormProps = {
   initialValues?: Partial<ScheduleFormValues>
@@ -47,6 +48,7 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
   const [dependencyMeta, setDependencyMeta] = useState<Record<number, { title: string }>>({})
   const [modalMode, setModalMode] = useState<null | 'previous' | 'next'>(null)
   const { offsetMinutes } = useTimePreferences()
+  const difficultyOptions = FIBONACCI_DIFFICULTIES
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -110,6 +112,12 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
   }
 
   const selectedMeta = (id: number) => dependencyMeta[id]?.title ?? `일정 #${id}`
+
+  const difficultyIndex = Math.max(0, difficultyOptions.indexOf(form.values.difficulty))
+  const difficultyStep = (direction: -1 | 1) => {
+    const nextIndex = Math.min(Math.max(difficultyIndex + direction, 0), difficultyOptions.length - 1)
+    form.onChange('difficulty', difficultyOptions[nextIndex])
+  }
 
   return (
     <form
@@ -175,24 +183,50 @@ const ScheduleForm = ({ initialValues, onSubmit, submitLabel = '일정 저장' }
 
       <label className="schedule-form__field schedule-form__range-field">
         <div className="schedule-form__range-header">
-          <span>긴급도</span>
-          <span className="schedule-form__range-value">{form.values.urgency}</span>
+          <span>난이도</span>
+          <span className="schedule-form__range-value">{form.values.difficulty}</span>
         </div>
-        <input
-          type="range"
-          min={1}
-          max={9}
-          step={1}
-          value={form.values.urgency}
-          onChange={(event) => form.onChange('urgency', Number(event.target.value))}
-          className="schedule-form__range-input"
-          style={buildRangeStyle(form.values.urgency, '#f87171')}
-        />
-        <div className="schedule-form__range-scale">
-          <span>1</span>
-          <span>9</span>
+        <div className="schedule-form__difficulty">
+          <button
+            type="button"
+            className="schedule-form__difficulty-step"
+            onClick={() => difficultyStep(-1)}
+            disabled={difficultyIndex === 0}
+            aria-label="난이도 낮추기"
+          >
+            ◀
+          </button>
+          <div className="schedule-form__difficulty-options" role="group" aria-label="난이도 선택">
+            {difficultyOptions.map((option) => {
+              const isActive = form.values.difficulty === option
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  className={[
+                    'schedule-form__difficulty-option',
+                    isActive ? 'is-active' : '',
+                  ].filter(Boolean).join(' ')}
+                  onClick={() => form.onChange('difficulty', option)}
+                  aria-pressed={isActive}
+                >
+                  {option}
+                </button>
+              )
+            })}
+          </div>
+          <button
+            type="button"
+            className="schedule-form__difficulty-step"
+            onClick={() => difficultyStep(1)}
+            disabled={difficultyIndex === difficultyOptions.length - 1}
+            aria-label="난이도 높이기"
+          >
+            ▶
+          </button>
         </div>
-        {form.errors.urgency && <small>{form.errors.urgency}</small>}
+        <p className="schedule-form__helper">허용 값: {difficultyOptions.join(', ')}</p>
+        {form.errors.difficulty && <small>{form.errors.difficulty}</small>}
       </label>
 
       <label className="schedule-form__field">

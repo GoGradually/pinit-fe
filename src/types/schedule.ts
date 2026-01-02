@@ -16,7 +16,7 @@ export type ScheduleResponse = {
   date: DateTimeWithZone
   deadline: DateTimeWithZone
   importance: number
-  urgency: number
+  difficulty: number
   state: ScheduleState
   duration?: string
   previousTasks?: ScheduleSummary[]
@@ -34,7 +34,7 @@ export type ScheduleRequest = {
   date: DateTimeWithZone
   deadline: DateTimeWithZone
   importance: number
-  urgency: number
+  difficulty: number
   taskType: ScheduleTaskType
   addDependencies?: DependencyRequest[]
   removeDependencies?: DependencyRequest[]
@@ -46,7 +46,7 @@ export type ScheduleFormValues = {
   date: Date
   deadline: Date
   importance: number
-  urgency: number
+  difficulty: number
   taskType: ScheduleTaskType
   previousTaskIds: number[]
   nextTaskIds: number[]
@@ -60,7 +60,7 @@ export type ScheduleSummary = {
   date: DateTimeWithZone
   deadline: DateTimeWithZone
   importance: number
-  urgency: number
+  difficulty: number
   taskType?: ScheduleTaskType // 백엔드에서 제공하지 않을 수 있음
   state: ScheduleState
   previousTasks?: ScheduleSummary[]

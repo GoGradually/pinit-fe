@@ -37,7 +37,7 @@ const ScheduleEditPage = () => {
         title: values.title,
         description: values.description,
         importance: values.importance,
-        urgency: values.urgency,
+        difficulty: values.difficulty,
         taskType: values.taskType,
         date: toApiDateTimeWithZone(values.date),
         deadline: toApiDateTimeWithZone(values.deadline),
@@ -67,7 +67,7 @@ const ScheduleEditPage = () => {
             date: toDateFromApi(schedule.date),
             deadline: toDateFromApi(schedule.deadline),
             importance: schedule.importance,
-            urgency: schedule.urgency,
+            difficulty: schedule.difficulty,
             // taskType은 백엔드에서 제공하지 않으므로 기본값 사용
           }
           : undefined
@@ -92,7 +92,7 @@ const ScheduleEditPage = () => {
         <p className="schedule-form-page__eyebrow">일정 수정</p>
         <h1 className="schedule-form-page__title">세부 정보 업데이트</h1>
         <p className="schedule-form-page__description">
-          기존 일정을 업데이트하고 변경 사항을 저장하세요. 시작/마감 시간과 중요도·긴급도 정보를 조정할
+          기존 일정을 업데이트하고 변경 사항을 저장하세요. 시작/마감 시간과 중요도·난이도 정보를 조정할
           수 있습니다.
         </p>
       </header>

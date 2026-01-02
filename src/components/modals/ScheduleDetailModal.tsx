@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../context/ToastContext'
 import { formatDateTimeWithZone } from '../../utils/datetime'
 import { formatDurationLabel } from '../../utils/duration'
-import { getImportanceStyle, getUrgencyStyle } from '../../utils/priorityStyles.ts'
+import { getImportanceStyle, getDifficultyStyle } from '../../utils/priorityStyles.ts'
 import type { ScheduleSummary } from '../../types/schedule'
 import { useScheduleCache } from '../../context/ScheduleCacheContext'
 import { useTimePreferences } from '../../context/TimePreferencesContext'
@@ -87,7 +87,7 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
   const startTime = formatDateTimeWithZone(schedule.date)
   const deadline = formatDateTimeWithZone(schedule.deadline)
   const importanceStyle = getImportanceStyle(schedule.importance)
-  const urgencyStyle = getUrgencyStyle(schedule.urgency)
+  const difficultyStyle = getDifficultyStyle(schedule.difficulty)
   const previousTasks: ScheduleSummary[] = schedule.previousTasks ?? []
   const nextTasks: ScheduleSummary[] = schedule.nextTasks ?? []
   const spentTimeLabel = formatDurationLabel(schedule.duration)
@@ -120,8 +120,8 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
               <span className="schedule-detail-modal__badge" style={importanceStyle}>
                 중요도 {schedule.importance}
               </span>
-              <span className="schedule-detail-modal__badge" style={urgencyStyle}>
-                긴급도 {schedule.urgency}
+              <span className="schedule-detail-modal__badge" style={difficultyStyle}>
+                난이도 {schedule.difficulty}
               </span>
             </div>
           </section>

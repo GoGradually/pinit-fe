@@ -34,7 +34,7 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
         title: values.title,
         description: values.description,
         importance: values.importance,
-        urgency: values.urgency,
+        difficulty: values.difficulty,
         taskType: values.taskType,
         date: toApiDateTimeWithZone(values.date),
         deadline: toApiDateTimeWithZone(values.deadline),
@@ -68,7 +68,7 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
         date: toDateFromApi(schedule.date),
         deadline: toDateFromApi(schedule.deadline),
         importance: schedule.importance,
-        urgency: schedule.urgency,
+        difficulty: schedule.difficulty,
         // taskType은 백엔드에서 제공하지 않으므로 기본값 사용
       }
     : undefined

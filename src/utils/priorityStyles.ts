@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 
-type PriorityType = 'importance' | 'urgency'
+type PriorityType = 'importance' | 'difficulty'
 
 type ColorScale = {
   hue: number
@@ -18,7 +18,7 @@ const scales: Record<PriorityType, ColorScale> = {
     text: [38, 18],
     border: [82, 46],
   },
-  urgency: {
+  difficulty: {
     hue: 356, // vivid red
     saturation: 84,
     background: [96, 60],
@@ -27,14 +27,23 @@ const scales: Record<PriorityType, ColorScale> = {
   },
 }
 
-const clampLevel = (value: number) => Math.min(9, Math.max(1, value))
+const ranges: Record<PriorityType, { min: number; max: number }> = {
+  importance: { min: 1, max: 9 },
+  difficulty: { min: 1, max: 21 },
+}
+
+const clampLevel = (value: number, type: PriorityType) => {
+  const { min, max } = ranges[type]
+  return Math.min(max, Math.max(min, value))
+}
 
 const interpolate = ([start, end]: [number, number], intensity: number) =>
   start + (end - start) * intensity
 
 const buildPriorityStyle = (value: number, type: PriorityType): CSSProperties => {
-  const level = clampLevel(value)
-  const intensity = (level - 1) / 8 // 0 (min) → 1 (max)
+  const level = clampLevel(value, type)
+  const { min, max } = ranges[type]
+  const intensity = (level - min) / (max - min) // 0 (min) → 1 (max)
   const { hue, saturation, background, text, border } = scales[type]
 
   const backgroundLightness = interpolate(background, intensity)
@@ -51,4 +60,4 @@ const buildPriorityStyle = (value: number, type: PriorityType): CSSProperties =>
 
 export const getImportanceStyle = (value: number): CSSProperties => buildPriorityStyle(value, 'importance')
 
-export const getUrgencyStyle = (value: number): CSSProperties => buildPriorityStyle(value, 'urgency')
+export const getDifficultyStyle = (value: number): CSSProperties => buildPriorityStyle(value, 'difficulty')

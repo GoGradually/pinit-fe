@@ -111,7 +111,7 @@ const ScheduleDependencyModal = ({
                       <div>
                         <strong>{schedule.title}</strong>
                         <small>
-                          중요도 {schedule.importance} · 긴급도 {schedule.urgency}
+                          중요도 {schedule.importance} · 난이도 {schedule.difficulty}
                         </small>
                       </div>
                     </label>
