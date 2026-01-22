@@ -107,7 +107,7 @@ const TodayPage = () => {
           </section>
 
           <section className="today-page__section">
-            <h2>✅ 시작 가능한 작업 ({tasks.length}건)</h2>
+            <h2>✅ 준비된 작업 ({tasks.length}건)</h2>
             {tasks.length === 0 ? (
               <p className="today-page__placeholder">선행 작업 없는 작업이 없습니다.</p>
             ) : (
