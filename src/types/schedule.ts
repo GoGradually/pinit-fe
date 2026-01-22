@@ -15,10 +15,13 @@ export type ScheduleResponse = {
   title: string
   description: string
   date: DateTimeWithZone
-  deadline: DateTimeWithZone
-  importance: number
-  difficulty: DifficultyValue
+  scheduleType: ScheduleTaskType
   state: ScheduleState
+  taskId?: number
+  // legacy / v0 fields (optional)
+  deadline?: DateTimeWithZone
+  importance?: number
+  difficulty?: DifficultyValue
   duration?: string
   previousTasks?: ScheduleSummary[]
   nextTasks?: ScheduleSummary[]
@@ -33,24 +36,16 @@ export type ScheduleRequest = {
   title: string
   description: string
   date: DateTimeWithZone
-  deadline: DateTimeWithZone
-  importance: number
-  difficulty: DifficultyValue
-  taskType: ScheduleTaskType
-  addDependencies?: DependencyRequest[]
-  removeDependencies?: DependencyRequest[]
+  scheduleType: ScheduleTaskType
+  taskId?: number
 }
 
 export type ScheduleFormValues = {
   title: string
   description: string
   date: Date
-  deadline: Date
-  importance: number
-  difficulty: DifficultyValue
-  taskType: ScheduleTaskType
-  previousTaskIds: number[]
-  nextTaskIds: number[]
+  scheduleType: ScheduleTaskType
+  taskId?: number
 }
 
 export type ScheduleSummary = {
@@ -59,13 +54,16 @@ export type ScheduleSummary = {
   title: string
   description: string
   date: DateTimeWithZone
-  deadline: DateTimeWithZone
-  importance: number
-  difficulty: DifficultyValue
-  taskType?: ScheduleTaskType // 백엔드에서 제공하지 않을 수 있음
+  scheduleType?: ScheduleTaskType // 백엔드에서 제공하지 않을 수 있음
   state: ScheduleState
+  duration?: string
+  taskId?: number
   previousTasks?: ScheduleSummary[]
   nextTasks?: ScheduleSummary[]
+  // optional legacy fields
+  deadline?: DateTimeWithZone
+  importance?: number
+  difficulty?: DifficultyValue
 }
 
 export type DateSchedulePresence = Record<

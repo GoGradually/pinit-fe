@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import ScheduleForm from '../schedules/ScheduleForm'
-import { createSchedule, updateSchedule } from '../../api/schedules'
+import { createSchedule, updateSchedule } from '../../api/schedulesV1'
 import { toApiDateTimeWithZone, toDateFromApi } from '../../utils/datetime'
 import type { ScheduleFormValues, ScheduleResponse } from '../../types/schedule'
 import { useToast } from '../../context/ToastContext'
@@ -33,11 +33,8 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
       const payload = {
         title: values.title,
         description: values.description,
-        importance: values.importance,
-        difficulty: values.difficulty,
-        taskType: values.taskType,
         date: toApiDateTimeWithZone(values.date),
-        deadline: toApiDateTimeWithZone(values.deadline),
+        scheduleType: values.scheduleType,
       }
       let result: ScheduleResponse | null = null
       if (mode === 'create') {
@@ -69,10 +66,7 @@ const ScheduleModal = ({ mode, schedule, onClose }: ScheduleModalProps) => {
         title: schedule.title,
         description: schedule.description,
         date: toDateFromApi(schedule.date),
-        deadline: toDateFromApi(schedule.deadline),
-        importance: schedule.importance,
-        difficulty: schedule.difficulty,
-        // taskType은 백엔드에서 제공하지 않으므로 기본값 사용
+        scheduleType: schedule.scheduleType ?? 'DEEP_WORK',
       }
     : undefined
 

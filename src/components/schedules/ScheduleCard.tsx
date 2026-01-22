@@ -1,5 +1,4 @@
 import type { ScheduleSummary } from '../../types/schedule'
-import { getImportanceStyle, getDifficultyStyle } from '../../utils/priorityStyles.ts'
 import './ScheduleCard.css'
 
 type ScheduleCardProps = {
@@ -11,7 +10,7 @@ type ScheduleCardProps = {
   onCancel: (scheduleId: number) => void
 }
 
-const taskTypeLabel: Record<NonNullable<ScheduleSummary['taskType']>, string> = {
+const taskTypeLabel: Record<NonNullable<ScheduleSummary['scheduleType']>, string> = {
   DEEP_WORK: '집중 작업',
   QUICK_TASK: '빠른 일정',
   ADMIN_TASK: '행정 작업',
@@ -48,9 +47,7 @@ const ScheduleCard = ({
   onComplete,
   onCancel,
 }: ScheduleCardProps) => {
-  const { id, title, description, importance, difficulty, taskType, state } = schedule
-  const importanceStyle = getImportanceStyle(importance)
-  const difficultyStyle = getDifficultyStyle(difficulty)
+  const { id, title, description, scheduleType, state } = schedule
 
   const handleClick = () => {
     onOpenDetail(id)
@@ -117,7 +114,7 @@ const ScheduleCard = ({
           </button>
           <div>
             <p className="schedule-card__title">{title}</p>
-            {taskType && <p className="schedule-card__subtitle">{taskTypeLabel[taskType]}</p>}
+            {scheduleType && <p className="schedule-card__subtitle">{taskTypeLabel[scheduleType]}</p>}
           </div>
         </div>
         <div className="schedule-card__header-actions">
@@ -133,14 +130,7 @@ const ScheduleCard = ({
       </header>
       <p className="schedule-card__description">{description}</p>
       <footer className="schedule-card__footer">
-        <div className="schedule-card__meta">
-          <span className="schedule-card__pill" style={importanceStyle}>
-            중요도 {importance}
-          </span>
-          <span className="schedule-card__pill" style={difficultyStyle}>
-            난이도 {difficulty}
-          </span>
-        </div>
+        <div className="schedule-card__meta" />
         {state === 'NOT_STARTED' && (
           <button
             type="button"

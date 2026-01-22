@@ -38,11 +38,22 @@ const API_VERSION = normalizeVersion(SERVICE_VERSIONS.api)
 const AUTH_API_VERSION = normalizeVersion(SERVICE_VERSIONS.auth)
 const NOTIFICATION_API_VERSION = normalizeVersion(SERVICE_VERSIONS.notification)
 
+export const API_BASE_URLS = {
+  v0: withVersion(rawApiBaseUrl, 'v0'),
+  v1: withVersion(rawApiBaseUrl, 'v1'),
+}
+
 export const API_BASE_URL = withVersion(rawApiBaseUrl, API_VERSION)
 export const AUTH_BASE_URL = withVersion(rawAuthBaseUrl, AUTH_API_VERSION)
 export const NOTIFICATION_BASE_URL = withVersion(rawNotificationBaseUrl, NOTIFICATION_API_VERSION)
 
-export const buildApiUrl = (path: string) => `${API_BASE_URL}${ensurePath(path)}`
+export const buildApiUrl = (path: string, version: 'v0' | 'v1' | '' = 'v1') => {
+  const base =
+    version === ''
+      ? normalizeBaseUrl(rawApiBaseUrl)
+      : API_BASE_URLS[version] ?? withVersion(rawApiBaseUrl, version)
+  return `${base}${ensurePath(path)}`
+}
 export const buildAuthUrl = (path: string) => `${AUTH_BASE_URL}${ensurePath(path)}`
 export const buildNotificationUrl = (path: string) =>
   `${NOTIFICATION_BASE_URL}${ensurePath(path)}`

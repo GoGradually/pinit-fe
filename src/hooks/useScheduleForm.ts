@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
-import dayjs from 'dayjs'
 import { getTodayWithOffset } from '../utils/datetime'
 import type { ScheduleFormValues } from '../types/schedule'
 import { useTimePreferences } from '../context/TimePreferencesContext'
-import { DEFAULT_DIFFICULTY, isValidDifficulty } from '../constants/difficulty'
 
 const buildDefaultDate = (offsetMinutes: number) => getTodayWithOffset(offsetMinutes).minute(0).second(0)
 
@@ -13,12 +11,7 @@ const createInitialValues = (offsetMinutes: number, overrides?: Partial<Schedule
     title: '',
     description: '',
     date: base.toDate(),
-    deadline: base.add(2, 'hour').toDate(),
-    importance: 5,
-    difficulty: DEFAULT_DIFFICULTY,
-    taskType: 'DEEP_WORK',
-    previousTaskIds: [],
-    nextTaskIds: [],
+    scheduleType: 'DEEP_WORK',
   }
   return { ...defaultValues, ...overrides }
 }
@@ -48,15 +41,6 @@ const useScheduleForm = ({ initialValues }: UseScheduleFormOptions = {}): UseSch
     const nextErrors: Partial<Record<keyof ScheduleFormValues, string>> = {}
     if (!values.title.trim()) nextErrors.title = '제목을 입력해 주세요.'
     if (!values.description.trim()) nextErrors.description = '설명을 입력해 주세요.'
-    if (dayjs(values.deadline).isBefore(values.date)) {
-      nextErrors.deadline = '마감일은 시작 시간 이후여야 합니다.'
-    }
-    if (values.importance < 1 || values.importance > 9) {
-      nextErrors.importance = '중요도는 1~9 사이여야 합니다.'
-    }
-    if (!isValidDifficulty(values.difficulty)) {
-      nextErrors.difficulty = '난이도는 1, 2, 3, 5, 8, 13, 21 중 하나여야 합니다.'
-    }
     setErrors(nextErrors)
     return Object.keys(nextErrors).length === 0
   }

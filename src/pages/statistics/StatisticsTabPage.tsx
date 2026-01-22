@@ -64,6 +64,7 @@ const StatisticsTabPage = () => {
     weekStartLabel,
     deepWorkMinutes,
     adminWorkMinutes,
+    quickWorkMinutes,
     totalMinutes,
     deepWorkRatio,
     adminWorkRatio,
@@ -111,7 +112,12 @@ const StatisticsTabPage = () => {
         />
       </div>
       <DonutChart deepWorkRatio={deepWorkRatio} adminWorkRatio={adminWorkRatio} />
-      <WeeklyBarChart deepWorkMinutes={deepWorkMinutes} adminWorkMinutes={adminWorkMinutes} totalMinutes={totalMinutes} />
+      <WeeklyBarChart
+        deepWorkMinutes={deepWorkMinutes}
+        adminWorkMinutes={adminWorkMinutes}
+        quickWorkMinutes={quickWorkMinutes}
+        totalMinutes={totalMinutes}
+      />
     </section>
   )
 }

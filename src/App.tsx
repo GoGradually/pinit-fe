@@ -4,9 +4,15 @@ import AppShell from './components/layout/AppShell'
 import SchedulesTabPage from './pages/schedule/tab/SchedulesTabPage.tsx'
 import StatisticsTabPage from './pages/statistics/StatisticsTabPage.tsx'
 import SettingsPage from './pages/setting/SettingsPage.tsx'
+import TodayPage from './pages/today/TodayPage.tsx'
+import TaskListPage from './pages/tasks/TaskListPage.tsx'
+import TaskCreatePage from './pages/tasks/TaskCreatePage.tsx'
+import TaskEditPage from './pages/tasks/TaskEditPage.tsx'
+import TaskDetailPage from './pages/tasks/TaskDetailPage.tsx'
 import { ScheduleCacheProvider } from './context/ScheduleCacheContext'
 import { ScheduleViewStateProvider } from './context/ScheduleViewStateContext'
 import { ToastProvider } from './context/ToastContext'
+import { TaskCacheProvider } from './context/TaskCacheContext'
 import { TimePreferencesProvider, useTimePreferences } from './context/TimePreferencesContext'
 import LandingPage from './pages/landing/LandingPage.tsx'
 import LoginPage from './pages/auth/LoginPage.tsx'
@@ -34,30 +40,38 @@ const AppContent = () => {
   }
 
   return (
-    <ScheduleCacheProvider>
-      <ScheduleViewStateProvider key={offsetMinutes}>
-        <ToastProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/login/callback/:provider" element={<SocialCallbackPage />} />
-              <Route element={<AuthGuard />}>
-                <Route path="/app" element={<AppShell />}>
-                  <Route index element={<Navigate to="/app/schedules" replace />} />
-                  <Route path="schedules" element={<SchedulesTabPage />} />
-                  <Route path="schedules/:scheduleId/edit" element={<ScheduleEditPage />} />
-                  <Route path="new" element={<ScheduleCreatePage />} />
-                  <Route path="statistics" element={<StatisticsTabPage />} />
-                  <Route path="settings" element={<SettingsPage />} />
+    <TaskCacheProvider>
+      <ScheduleCacheProvider>
+        <ScheduleViewStateProvider key={offsetMinutes}>
+          <ToastProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/login/callback/:provider" element={<SocialCallbackPage />} />
+                <Route element={<AuthGuard />}>
+                  <Route path="/app" element={<AppShell />}>
+                    <Route index element={<Navigate to="/app/today" replace />} />
+                    <Route path="today" element={<TodayPage />} />
+                    <Route path="schedules" element={<SchedulesTabPage />} />
+                    <Route path="schedules/new" element={<ScheduleCreatePage />} />
+                    <Route path="schedules/:scheduleId/edit" element={<ScheduleEditPage />} />
+                    <Route path="new" element={<ScheduleCreatePage />} />
+                    <Route path="tasks" element={<TaskListPage />} />
+                    <Route path="tasks/new" element={<TaskCreatePage />} />
+                    <Route path="tasks/:taskId" element={<TaskDetailPage />} />
+                    <Route path="tasks/:taskId/edit" element={<TaskEditPage />} />
+                    <Route path="statistics" element={<StatisticsTabPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                  </Route>
                 </Route>
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </ToastProvider>
-      </ScheduleViewStateProvider>
-    </ScheduleCacheProvider>
+              </Routes>
+            </BrowserRouter>
+          </ToastProvider>
+        </ScheduleViewStateProvider>
+      </ScheduleCacheProvider>
+    </TaskCacheProvider>
   )
 }
 

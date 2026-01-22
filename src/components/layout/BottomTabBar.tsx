@@ -8,7 +8,9 @@ type BottomTabBarProps = {
 }
 
 const tabs = [
+  { key: 'today', label: '오늘', path: '/app/today', icon: '✨' },
   { key: 'schedules', label: '일정', path: '/app/schedules', icon: '📅' },
+  { key: 'tasks', label: '작업', path: '/app/tasks', icon: '✅' },
   { key: 'statistics', label: '통계', path: '/app/statistics', icon: '📊' },
 ]
 
@@ -22,17 +24,28 @@ const BottomTabBar = ({ activePath }: BottomTabBarProps) => {
   const { selectedDate } = useScheduleViewStateContext()
 
   const getActiveTab = (path: string) => {
+    if (path.startsWith('/app/today')) return '/app/today'
     if (path.startsWith('/app/schedules')) return '/app/schedules'
+    if (path.startsWith('/app/tasks')) return '/app/tasks'
     if (path.startsWith('/app/statistics')) return '/app/statistics'
-    return '/app/schedules'
+    return '/app/today'
   }
 
   const activeTab = getActiveTab(activePath)
 
   const handleAddClick = () => {
-    const isOnSchedulePage = activePath.startsWith('/app/schedules')
-    const state = isOnSchedulePage ? { initialDateKey: toDateKey(selectedDate) } : undefined
-    navigate('/app/new', state ? { state } : undefined)
+    if (activePath.startsWith('/app/tasks')) {
+      navigate('/app/tasks/new')
+      return
+    }
+    if (activePath.startsWith('/app/schedules')) {
+      const state = { initialDateKey: toDateKey(selectedDate) }
+      navigate('/app/schedules/new', { state })
+      return
+    }
+    // default: today → 일정 만들기로 안내
+    const state = { initialDateKey: toDateKey(selectedDate) }
+    navigate('/app/schedules/new', { state })
   }
 
   return (

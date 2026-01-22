@@ -12,9 +12,11 @@ export type WeeklyStatisticsView = {
   weekStartLabel: string
   deepWorkMinutes: number
   adminWorkMinutes: number
+  quickWorkMinutes: number
   totalMinutes: number
   deepWorkRatio: number
   adminWorkRatio: number
+  quickWorkRatio: number
 }
 
 export type WeeklyStatisticsSet = {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import type dayjs from 'dayjs'
 import type { ScheduleSummary } from '../types/schedule'
 import { toDateKey } from '../utils/datetime'
-import { fetchScheduleSummaries } from '../api/schedules'
+import { fetchSchedules } from '../api/schedulesV1'
 
 type UseScheduleListReturn = {
   schedules: ScheduleSummary[]
@@ -42,7 +42,7 @@ const useScheduleList = (selectedDate: dayjs.Dayjs): UseScheduleListReturn => {
       setError(null)
 
       try {
-        const response = await fetchScheduleSummaries(apiDateTime)
+        const response = await fetchSchedules(apiDateTime)
         if (isCancelled) return
         applySchedules(response)
       } catch (error) {

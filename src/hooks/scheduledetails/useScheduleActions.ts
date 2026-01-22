@@ -5,11 +5,13 @@ import {
   cancelSchedule,
   fetchActiveScheduleId,
   fetchScheduleDetail,
-} from '../../api/schedules.ts'
+} from '../../api/schedulesV1.ts'
 import { useEffect, useMemo, useState } from 'react'
 import type { ScheduleState } from '../../types/schedule.ts'
 import { useScheduleCache } from '../../context/ScheduleCacheContext'
 import { useToast } from '../../context/ToastContext'
+import { dispatchScheduleChanged } from '../../utils/events'
+import { useScheduleTaskSync } from '../../utils/scheduleTaskSync'
 
 // 실제 백엔드 상태에 맞게 수정
 // NOT_STARTED: 시작, 완료 가능
@@ -46,12 +48,17 @@ type UseScheduleActionsResult = {
  * @param scheduleId - 일정 ID
  * @param initialState - 초기 상태
  */
-const useScheduleActions = (scheduleId: number | null, initialState: ScheduleState): UseScheduleActionsResult => {
+const useScheduleActions = (
+  scheduleId: number | null,
+  initialState: ScheduleState,
+  options: { syncTask?: boolean } = {},
+): UseScheduleActionsResult => {
   const [currentState, setCurrentState] = useState<ScheduleState>(initialState)
   const [isMutating, setIsMutating] = useState(false)
   const [lastMessage, setLastMessage] = useState<string | null>(null)
   const { updateScheduleState, setActiveSchedule, setSchedule, activeScheduleId, schedulesById } =
     useScheduleCache()
+  const { syncTaskStateWithSchedule } = useScheduleTaskSync()
   const { addToast } = useToast()
   const cachedState = scheduleId ? schedulesById[scheduleId]?.state : undefined
 
@@ -105,6 +112,16 @@ const useScheduleActions = (scheduleId: number | null, initialState: ScheduleSta
       setCurrentState(nextState)
       updateScheduleState(scheduleId, nextState)
       setLastMessage(message)
+      try {
+        const detail = await fetchScheduleDetail(scheduleId)
+        setSchedule(detail)
+        if (options.syncTask !== false && detail.taskId != null) {
+          await syncTaskStateWithSchedule(detail.taskId, nextState)
+        }
+      } catch (error) {
+        console.error('Failed to refresh schedule detail after mutation:', error)
+      }
+      dispatchScheduleChanged('state-mutated', { scheduleId, state: nextState })
     } catch (error) {
       console.error(`❌ Mutation failed for schedule ${scheduleId}:`, error)
       setLastMessage(error instanceof Error ? error.message : '작업 실패')

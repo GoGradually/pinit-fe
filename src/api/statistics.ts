@@ -15,5 +15,5 @@ export const fetchWeeklyStatistics = ({ time }: WeeklyStatisticsParams) => {
     zoneId: timeParam.zoneId,
   })
 
-  return httpClient<StatisticsResponse>(buildApiUrl(`/statistics?${query.toString()}`))
+  return httpClient<StatisticsResponse>(buildApiUrl(`/statistics?${query.toString()}`, 'v1'))
 }

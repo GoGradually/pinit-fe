@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import type { OverdueSummary, ScheduleResponse } from '../types/schedule'
-import { fetchWeeklySchedules } from '../api/schedules'
+import { fetchWeeklySchedules } from '../api/schedulesV1'
 import { getTodayWithOffset, toApiDateTimeWithZone, toDateFromApi, toDateKey } from '../utils/datetime'
 import { useTimePreferences } from '../context/TimePreferencesContext'
 
@@ -24,9 +24,8 @@ const useOverdueSchedulesSummary = () => {
         const today = getTodayWithOffset(offsetMinutes)
         const todayKey = toDateKey(today)
 
-        // 현재 주의 일정을 조회
-        const time = toApiDateTimeWithZone(today)
-        const schedules = await fetchWeeklySchedules(time)
+        // 현재 주의 일정을 조회 (v1 주간 API)
+        const schedules = await fetchWeeklySchedules(toApiDateTimeWithZone(today))
 
         // 오늘 이전 날짜의 미완료 일정 필터링
         const overdueSchedules = schedules.filter((schedule: ScheduleResponse) => {

@@ -1,5 +1,6 @@
 import useActiveSchedule from '../../hooks/scheduledetails/useActiveSchedule.ts'
 import useScheduleActions from '../../hooks/scheduledetails/useScheduleActions.ts'
+import { useScheduleCache } from '../../context/ScheduleCacheContext'
 import type { ScheduleState } from '../../types/schedule'
 import './MiniPlayerBar.css'
 
@@ -7,13 +8,26 @@ import './MiniPlayerBar.css'
 // 대체할 이름 없음
 const MiniPlayerBar = () => {
   const activeSchedule = useActiveSchedule()
+  const { activeScheduleId } = useScheduleCache()
   const scheduleActions = useScheduleActions(
     activeSchedule?.id ?? null,
-    (activeSchedule?.state ?? 'NOT_STARTED') as ScheduleState
+    (activeSchedule?.state ?? 'NOT_STARTED') as ScheduleState,
+    { syncTask: false }, // Mini player는 Task 상태와 독립적으로 schedule만 제어
   )
 
-  // IN_PROGRESS 또는 SUSPENDED 상태일 때만 표시
-  if (!activeSchedule || (activeSchedule.state !== 'IN_PROGRESS' && activeSchedule.state !== 'SUSPENDED')) {
+  const stateLabel: Record<ScheduleState, string> = {
+    NOT_STARTED: '미시작',
+    IN_PROGRESS: '진행중',
+    COMPLETED: '완료',
+    SUSPENDED: '일시정지',
+  }
+
+  // 서버가 알려준 현재 활성 일정만 제어하며, IN_PROGRESS/SUSPENDED일 때만 표시
+  if (
+    !activeSchedule ||
+    activeSchedule.id !== activeScheduleId ||
+    (activeSchedule.state !== 'IN_PROGRESS' && activeSchedule.state !== 'SUSPENDED')
+  ) {
     return null
   }
 
@@ -23,6 +37,11 @@ const MiniPlayerBar = () => {
         <div>
           <p className="mini-player__title">진행 중인 일정</p>
           <p className="mini-player__description">{activeSchedule.title}</p>
+          <p className="mini-player__meta">
+            <span className="mini-player__pill mini-player__pill--state">{stateLabel[activeSchedule.state]}</span>
+            {activeSchedule.scheduleType && <span className="mini-player__pill">{activeSchedule.scheduleType}</span>}
+            {activeSchedule.taskId != null && <span className="mini-player__pill">작업 #{activeSchedule.taskId}</span>}
+          </p>
         </div>
         <div className="mini-player__buttons">
           <button

@@ -7,8 +7,13 @@ export type ScheduleCacheValue = {
   activeScheduleId: number | null
   activeSchedule: ScheduleResponse | null
   setSchedule: (schedule: ScheduleResponse) => void
+  upsertSchedule: (schedule: ScheduleResponse) => void
   setActiveSchedule: (scheduleId: number | null) => void
-  updateScheduleState: (scheduleId: number, nextState: ScheduleState) => void
+  updateScheduleState: (
+    scheduleId: number,
+    nextState: ScheduleState,
+    extras?: Partial<Pick<ScheduleResponse, 'scheduleType' | 'taskId' | 'duration'>>,
+  ) => void
 }
 
 const ScheduleCacheContext = createContext<ScheduleCacheValue | null>(null)
@@ -17,30 +22,44 @@ export const ScheduleCacheProvider = ({ children }: { children: ReactNode }) => 
   const [schedulesById, setSchedulesById] = useState<Record<number, ScheduleResponse>>({})
   const [activeScheduleId, setActiveScheduleId] = useState<number | null>(null)
 
-  const setSchedule = useCallback((schedule: ScheduleResponse) => {
+  const upsertSchedule = useCallback((schedule: ScheduleResponse) => {
     setSchedulesById((prev) => ({
       ...prev,
       [schedule.id]: schedule,
     }))
   }, [])
 
+  // alias to keep existing callers readable
+  const setSchedule = upsertSchedule
+
   const setActiveSchedule = useCallback((scheduleId: number | null) => {
     setActiveScheduleId(scheduleId)
   }, [])
 
-  const updateScheduleState = useCallback((scheduleId: number, nextState: ScheduleState) => {
-    setSchedulesById((prev) => {
-      const current = prev[scheduleId]
-      if (!current) return prev
-      return {
-        ...prev,
-        [scheduleId]: { ...current, state: nextState },
+  const updateScheduleState = useCallback(
+    (
+      scheduleId: number,
+      nextState: ScheduleState,
+      extras?: Partial<Pick<ScheduleResponse, 'scheduleType' | 'taskId' | 'duration'>>,
+    ) => {
+      setSchedulesById((prev) => {
+        const current = prev[scheduleId]
+        if (!current) return prev
+        return {
+          ...prev,
+          [scheduleId]: {
+            ...current,
+            state: nextState,
+            ...extras,
+          },
+        }
+      })
+      if (scheduleId === activeScheduleId && nextState === 'COMPLETED') {
+        setActiveScheduleId(null)
       }
-    })
-    if (scheduleId === activeScheduleId && nextState === 'COMPLETED') {
-      setActiveScheduleId(null)
-    }
-  }, [activeScheduleId])
+    },
+    [activeScheduleId],
+  )
 
   const value = useMemo(
     () => ({
@@ -48,10 +67,11 @@ export const ScheduleCacheProvider = ({ children }: { children: ReactNode }) => 
       activeScheduleId,
       activeSchedule: activeScheduleId ? schedulesById[activeScheduleId] ?? null : null,
       setSchedule,
+      upsertSchedule,
       setActiveSchedule,
       updateScheduleState,
     }),
-    [activeScheduleId, schedulesById, setActiveSchedule, setSchedule, updateScheduleState],
+    [activeScheduleId, schedulesById, setActiveSchedule, setSchedule, upsertSchedule, updateScheduleState],
   )
 
   return <ScheduleCacheContext.Provider value={value}>{children}</ScheduleCacheContext.Provider>

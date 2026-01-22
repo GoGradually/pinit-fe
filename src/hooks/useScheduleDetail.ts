@@ -1,4 +1,4 @@
-import { fetchScheduleDetail } from '../api/schedules'
+import { fetchScheduleDetail } from '../api/schedulesV1'
 import { useEffect, useState } from 'react'
 import { useScheduleCache } from '../context/ScheduleCacheContext'
 import type { ScheduleResponse } from '../types/schedule'

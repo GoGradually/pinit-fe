@@ -28,6 +28,10 @@
   background-color: #f97316;
 }
 
+.weekly-bar__segment--quick {
+  background-color: #10b981;
+}
+
 .weekly-bar__legend {
   font-size: 14px;
   color: #475569;
@@ -35,4 +39,3 @@
   flex-direction: column;
   gap: 4px;
 }
-

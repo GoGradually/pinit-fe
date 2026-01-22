@@ -3,6 +3,13 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+const enableMockApi = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true'
+
+if (enableMockApi) {
+  const { setupMockServer } = await import('./mocks/mockServer')
+  setupMockServer()
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

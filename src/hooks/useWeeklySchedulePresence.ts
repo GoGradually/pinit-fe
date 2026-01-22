@@ -3,7 +3,7 @@ import type dayjs from 'dayjs'
 import { getWeekDays, toApiDateTimeWithZone, toDateKey } from '../utils/datetime'
 import type { DateSchedulePresence } from '../types/schedule'
 import type { ScheduleResponse } from '../types/schedule'
-import { fetchWeeklySchedules } from '../api/schedules'
+import { fetchWeeklySchedules } from '../api/schedulesV1'
 
 type Options = {
   weekStart: dayjs.Dayjs
@@ -34,9 +34,7 @@ const useWeeklySchedulePresence = ({ weekStart, anchorDate }: Options): UseWeekl
       setIsLoading(true)
       setError(null)
       try {
-        // 주간 일정을 한 번에 조회
         const base = anchorDate ?? weekStart
-        // 주간 API가 주 내부 시각을 기대하므로 정오로 이동해 경계 문제 방지
         const time = toApiDateTimeWithZone(base.hour(12))
         const schedules = await fetchWeeklySchedules(time)
         if (!isMounted) return

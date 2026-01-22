@@ -8,18 +8,25 @@ import { clearAuthTokens, getAccessToken, isLoggedOut } from '../../api/authToke
 import './AppShell.css'
 
 const TAB_TITLES: Record<string, string> = {
+  '/app/today': '오늘 할당된 일',
   '/app/schedules': '일정',
+  '/app/schedules/new': '일정 추가',
   '/app/new': '일정 추가',
+  '/app/tasks': '작업',
   '/app/statistics': '통계',
   '/app/settings': '설정',
 }
 
 const getPageTitle = (pathname: string): string => {
   if (pathname.includes('/edit')) {
+    if (pathname.startsWith('/app/tasks/')) return '작업 수정'
     return '일정 수정'
   }
   if (pathname.startsWith('/app/schedules/')) {
     return '일정 상세'
+  }
+  if (pathname.startsWith('/app/tasks/')) {
+    return '작업 상세'
   }
   return TAB_TITLES[pathname] ?? '일정'
 }
@@ -64,9 +71,11 @@ const AppShell = () => {
 
   const title = getPageTitle(pathname)
   const showSettingsButton = pathname !== '/app/settings'
-  const isDetailPage = pathname.startsWith('/app/schedules/') && pathname.split('/').length > 3
-  const isNewPage = pathname === '/app/new'
-  const showBackButton = isDetailPage || pathname === '/app/settings' || isNewPage
+  const isScheduleDetail = pathname.startsWith('/app/schedules/') && pathname.split('/').length > 3
+  const isTaskDetail = pathname.startsWith('/app/tasks/') && pathname.split('/').length > 3
+  const isNewPage = pathname === '/app/new' || pathname === '/app/schedules/new' || pathname === '/app/tasks/new'
+  const isSettingsPage = pathname === '/app/settings'
+  const showBackButton = isScheduleDetail || isTaskDetail || isSettingsPage || isNewPage
 
   return (
     <div className="app-shell">

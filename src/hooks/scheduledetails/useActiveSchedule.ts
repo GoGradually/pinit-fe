@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { fetchActiveScheduleId, fetchScheduleDetail } from '../../api/schedules'
+import { fetchActiveScheduleId, fetchScheduleDetail } from '../../api/schedulesV1'
 import type { ScheduleSummary } from '../../types/schedule.ts'
 import { useScheduleCache } from '../../context/ScheduleCacheContext'
+import { dispatchTaskChanged } from '../../utils/events'
 
 const useActiveSchedule = (): ScheduleSummary | null => {
   const [active, setActive] = useState<ScheduleSummary | null>(null)
@@ -29,13 +30,16 @@ const useActiveSchedule = (): ScheduleSummary | null => {
             title: detail.title,
             description: detail.description,
             date: detail.date,
-            deadline: detail.deadline,
-            importance: detail.importance,
-            difficulty: detail.difficulty,
             state: detail.state,
+            scheduleType: detail.scheduleType,
+            taskId: detail.taskId,
+            duration: detail.duration,
           })
           setSchedule(detail)
           setActiveSchedule(activeId)
+          if (detail.taskId != null) {
+            dispatchTaskChanged(detail.taskId, 'active-schedule-loaded')
+          }
         }
       } catch (error) {
         console.error('Failed to load active schedule:', error)

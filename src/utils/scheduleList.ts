@@ -16,8 +16,8 @@ export const areScheduleListsEqual = (
       current.date.dateTime === previous.date.dateTime &&
       current.date.zoneId === previous.date.zoneId
     const hasSameDeadline =
-      current.deadline.dateTime === previous.deadline.dateTime &&
-      current.deadline.zoneId === previous.deadline.zoneId
+      current.deadline?.dateTime === previous.deadline?.dateTime &&
+      current.deadline?.zoneId === previous.deadline?.zoneId
 
     const isSame =
       current.id === previous.id &&
@@ -26,10 +26,8 @@ export const areScheduleListsEqual = (
       current.description === previous.description &&
       hasSameDate &&
       hasSameDeadline &&
-      current.importance === previous.importance &&
-      current.difficulty === previous.difficulty &&
       current.state === previous.state &&
-      current.taskType === previous.taskType
+      current.scheduleType === previous.scheduleType
 
     if (!isSame) {
       return false

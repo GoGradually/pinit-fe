@@ -16,7 +16,7 @@ import {
   completeSchedule,
   fetchScheduleDetail,
   updateSchedule,
-} from '../../../api/schedules.ts'
+} from '../../../api/schedulesV1.ts'
 import type { ScheduleResponse, ScheduleSummary } from '../../../types/schedule'
 import useWeeklyStatistics from '../../../hooks/useWeeklyStatistics.ts'
 import { formatMinutesToTime } from '../../../utils/statisticsTransform.ts'
@@ -24,6 +24,7 @@ import './SchedulesTabPage.css'
 import { addDays, toApiDateTimeWithZone, toDateKey, toDisplayDayjs } from '../../../utils/datetime.ts'
 import { useToast } from '../../../context/ToastContext'
 import { useScheduleCache } from '../../../context/ScheduleCacheContext'
+import { useScheduleTaskSync } from '../../../utils/scheduleTaskSync'
 
 const EDGE_GUTTER = 72
 const DRAG_ACTIVATE_DISTANCE = 6
@@ -72,6 +73,7 @@ const SchedulesTabPage = () => {
     activeScheduleId,
     schedulesById,
   } = useScheduleCache()
+  const { syncTaskStateWithSchedule } = useScheduleTaskSync()
 
   const schedules = useMemo(
     () =>
@@ -147,6 +149,9 @@ const SchedulesTabPage = () => {
         setSchedule(detail)
         setActiveSchedule(scheduleId)
         updateScheduleState(scheduleId, detail.state)
+        if (detail.taskId != null) {
+          await syncTaskStateWithSchedule(detail.taskId, detail.state)
+        }
       } catch (error) {
         console.error('⚠️ Failed to cache active schedule detail after start:', error)
       }
@@ -165,6 +170,15 @@ const SchedulesTabPage = () => {
       updateScheduleState(scheduleId, 'NOT_STARTED')
       if (activeScheduleId === scheduleId) {
         setActiveSchedule(null)
+      }
+      try {
+        const detail = await fetchScheduleDetail(scheduleId)
+        setSchedule(detail)
+        if (detail.taskId != null) {
+          await syncTaskStateWithSchedule(detail.taskId, 'NOT_STARTED')
+        }
+      } catch (error) {
+        console.error('⚠️ Failed to refresh schedule detail after cancel:', error)
       }
       refetchSchedules()
     } catch (error) {
@@ -185,6 +199,9 @@ const SchedulesTabPage = () => {
         const detail = await fetchScheduleDetail(scheduleId)
         setSchedule(detail)
         updateScheduleState(scheduleId, detail.state)
+        if (detail.taskId != null) {
+          await syncTaskStateWithSchedule(detail.taskId, 'COMPLETED')
+        }
       } catch (error) {
         console.error('⚠️ Failed to refresh schedule detail after complete:', error)
       }
@@ -202,10 +219,8 @@ const SchedulesTabPage = () => {
     setMovingScheduleId(schedule.id)
     try {
       const nextDate = addDays(schedule.date, offset)
-      const nextDeadline = addDays(schedule.deadline, offset)
       const updated = await updateSchedule(schedule.id, {
         date: toApiDateTimeWithZone(nextDate),
-        deadline: toApiDateTimeWithZone(nextDeadline),
       })
       setSchedule(updated)
       window.dispatchEvent(

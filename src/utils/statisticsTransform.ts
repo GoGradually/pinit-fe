@@ -60,6 +60,7 @@ export const toWeeklyStatisticsView = (payload: StatisticsResponse): WeeklyStati
   const deepWorkMinutes = parseElapsedTime(payload.deepWorkElapsedTime)
   const adminWorkMinutes = parseElapsedTime(payload.adminWorkElapsedTime)
   const totalMinutes = parseElapsedTime(payload.totalWorkElapsedTime)
+  const quickWorkMinutes = Math.max(totalMinutes - deepWorkMinutes - adminWorkMinutes, 0)
   const startOfWeek = toDisplayDayjs(payload.startOfWeek)
 
   const result = {
@@ -68,9 +69,11 @@ export const toWeeklyStatisticsView = (payload: StatisticsResponse): WeeklyStati
       .format('M월 D일')}`,
     deepWorkMinutes,
     adminWorkMinutes,
+    quickWorkMinutes,
     totalMinutes,
     deepWorkRatio: totalMinutes ? deepWorkMinutes / totalMinutes : 0,
     adminWorkRatio: totalMinutes ? adminWorkMinutes / totalMinutes : 0,
+    quickWorkRatio: totalMinutes ? quickWorkMinutes / totalMinutes : 0,
   }
 
   console.log('✅ Transformation complete:', result)

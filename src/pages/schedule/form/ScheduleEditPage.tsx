@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ScheduleForm from '../../../components/schedules/ScheduleForm'
-import { updateSchedule } from '../../../api/schedules'
 import { toApiDateTimeWithZone, toDateFromApi } from '../../../utils/datetime'
 import type { ScheduleFormValues, ScheduleResponse } from '../../../types/schedule'
 import useScheduleDetail from '../../../hooks/useScheduleDetail'
 import { useToast } from '../../../context/ToastContext'
 import { useTimePreferences } from '../../../context/TimePreferencesContext'
 import './ScheduleFormPage.css'
+import { updateSchedule } from '../../../api/schedulesV1'
 
 const ScheduleEditPage = () => {
   const { scheduleId } = useParams()
@@ -36,11 +36,8 @@ const ScheduleEditPage = () => {
       const payload = {
         title: values.title,
         description: values.description,
-        importance: values.importance,
-        difficulty: values.difficulty,
-        taskType: values.taskType,
         date: toApiDateTimeWithZone(values.date),
-        deadline: toApiDateTimeWithZone(values.deadline),
+        scheduleType: values.scheduleType,
       }
       const result: ScheduleResponse | null = await updateSchedule(Number(scheduleId), payload)
       if (result) {
@@ -66,10 +63,7 @@ const ScheduleEditPage = () => {
             title: schedule.title,
             description: schedule.description,
             date: toDateFromApi(schedule.date),
-            deadline: toDateFromApi(schedule.deadline),
-            importance: schedule.importance,
-            difficulty: schedule.difficulty,
-            // taskType은 백엔드에서 제공하지 않으므로 기본값 사용
+            scheduleType: schedule.scheduleType ?? 'DEEP_WORK',
           }
           : undefined
     },

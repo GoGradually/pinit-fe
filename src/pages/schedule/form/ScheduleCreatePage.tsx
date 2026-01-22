@@ -1,9 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
 import ScheduleForm from '../../../components/schedules/ScheduleForm'
-import { createSchedule } from '../../../api/schedules'
 import { getTodayWithOffset, toApiDateTimeWithZone, toDisplayDayjs } from '../../../utils/datetime'
 import type { ScheduleFormValues, ScheduleResponse } from '../../../types/schedule'
+import { createSchedule } from '../../../api/schedulesV1'
 import { useToast } from '../../../context/ToastContext'
 import { useTimePreferences } from '../../../context/TimePreferencesContext'
 import './ScheduleFormPage.css'
@@ -28,7 +28,6 @@ const ScheduleCreatePage = () => {
     const start = targetDate.hour(now.hour()).minute(0).second(0)
     return {
       date: start.toDate(),
-      deadline: start.add(2, 'hour').toDate(),
     }
   }, [initialDateKey, offsetMinutes])
 
@@ -45,11 +44,8 @@ const ScheduleCreatePage = () => {
       const payload = {
         title: values.title,
         description: values.description,
-        importance: values.importance,
-        difficulty: values.difficulty,
-        taskType: values.taskType,
         date: toApiDateTimeWithZone(values.date),
-        deadline: toApiDateTimeWithZone(values.deadline),
+        scheduleType: values.scheduleType,
       }
       const result: ScheduleResponse | null = await createSchedule(payload)
       if (result) {

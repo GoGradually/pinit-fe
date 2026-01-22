@@ -1,0 +1,51 @@
+.task-sched-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.task-sched-modal__content {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-sched-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-sched-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-sched-modal__body label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-sched-modal__body input,
+.task-sched-modal__body textarea,
+.task-sched-modal__body select {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.task-sched-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
