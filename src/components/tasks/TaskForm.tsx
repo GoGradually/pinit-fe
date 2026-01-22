@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import dayjs from 'dayjs'
 import { FIBONACCI_DIFFICULTIES } from '../../constants/difficulty'
 import type { DifficultyValue } from '../../constants/difficulty'
@@ -44,6 +45,7 @@ const TaskForm = ({ initialValues, onSubmit, submitLabel = '저장' }: TaskFormP
   const [modalMode, setModalMode] = useState<null | 'previous' | 'next'>(null)
   const [dependencyMeta, setDependencyMeta] = useState<Record<number, { title: string }>>({})
   const isSubmitting = false // mutation 상태 필요시 state로 확장
+  const importancePercent = ((values.importance - 1) / 8) * 100
 
   const validate = () => {
     const next: Record<string, string> = {}
@@ -93,25 +95,48 @@ const TaskForm = ({ initialValues, onSubmit, submitLabel = '저장' }: TaskFormP
       </label>
 
       <label className="task-form__field">
-        <span>중요도 (1~9)</span>
+        <div className="task-form__field-head">
+          <span>중요도 (1~9)</span>
+          <span className="task-form__field-value">{values.importance}</span>
+        </div>
         <input
-          type="number"
+          className="task-form__slider"
+          type="range"
           min={1}
           max={9}
+          step={1}
           value={values.importance}
-          onChange={(e) => setValues((prev) => ({ ...prev, importance: Number(e.target.value) }))}
+          onChange={(e) =>
+            setValues((prev) => ({ ...prev, importance: Number(e.target.value) }))
+          }
+          style={
+            {
+              '--range-progress': `${importancePercent}%`,
+              '--range-color': '#2563eb',
+            } as CSSProperties
+          }
         />
+        <div className="task-form__slider-scale">
+          {[1, 3, 5, 7, 9].map((mark) => (
+            <span key={mark}>{mark}</span>
+          ))}
+        </div>
         {errors.importance && <small>{errors.importance}</small>}
       </label>
 
-      <label className="task-form__field">
+      <div className="task-form__field">
         <span>난이도</span>
-        <div className="task-form__chips">
+        <div className="task-form__difficulty-row">
           {FIBONACCI_DIFFICULTIES.map((diff) => (
             <button
               key={diff}
               type="button"
-              className={['task-form__chip', values.difficulty === diff ? 'is-active' : ''].join(' ').trim()}
+              className={[
+                'task-form__difficulty-pill',
+                values.difficulty === diff ? 'is-active' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
               onClick={() => setValues((prev) => ({ ...prev, difficulty: diff }))}
               aria-pressed={values.difficulty === diff}
             >
@@ -119,7 +144,7 @@ const TaskForm = ({ initialValues, onSubmit, submitLabel = '저장' }: TaskFormP
             </button>
           ))}
         </div>
-      </label>
+      </div>
 
       <div className="task-form__actions">
         <button type="submit" className="task-form__primary" disabled={isSubmitting}>
