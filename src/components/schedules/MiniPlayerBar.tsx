@@ -39,8 +39,6 @@ const MiniPlayerBar = () => {
           <p className="mini-player__description">{activeSchedule.title}</p>
           <p className="mini-player__meta">
             <span className="mini-player__pill mini-player__pill--state">{stateLabel[activeSchedule.state]}</span>
-            {activeSchedule.scheduleType && <span className="mini-player__pill">{activeSchedule.scheduleType}</span>}
-            {activeSchedule.taskId != null && <span className="mini-player__pill">작업 #{activeSchedule.taskId}</span>}
           </p>
         </div>
         <div className="mini-player__buttons">
