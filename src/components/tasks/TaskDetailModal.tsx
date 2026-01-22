@@ -157,7 +157,7 @@ const TaskDetailModal = ({ taskId, onClose }: TaskDetailModalProps) => {
                   </span>
                   {task.dueDate && (
                     <span className="task-detail-modal__badge" style={getDeadlineStyle(task.dueDate)}>
-                      마감 {dayjs(task.dueDate.dateTime).format('M/D HH:mm')}
+                      마감 {dayjs(task.dueDate.dateTime).format('M/D')}
                     </span>
                   )}
                 </div>

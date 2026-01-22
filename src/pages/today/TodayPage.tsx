@@ -125,7 +125,7 @@ const TodayPage = () => {
                             className="today-page__pill"
                             style={getDeadlineStyle(cached.dueDate)}
                           >
-                            {dayjs(cached.dueDate.dateTime).format('M/D HH:mm')}
+                            {dayjs(cached.dueDate.dateTime).format('M/D')}
                           </span>
                           <span className="today-page__pill">{cached.isCompleted ? '완료' : '미완료'}</span>
                             </>

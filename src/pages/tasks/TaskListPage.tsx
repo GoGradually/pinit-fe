@@ -115,11 +115,8 @@ const TaskListPage = () => {
                 </div>
                 <div className="task-page__item-meta">
                   {item.dueDate && (
-                    <span
-                      className="task-page__pill"
-                      style={getDeadlineStyle(item.dueDate)}
-                    >
-                      마감 {dayjs(item.dueDate.dateTime).format('M/D HH:mm')}
+                    <span className="task-page__pill" style={getDeadlineStyle(item.dueDate)}>
+                      마감 {dayjs(item.dueDate.dateTime).format('M/D')}
                     </span>
                   )}
                   <span className="task-page__pill" style={getImportanceStyle(item.importance)}>
