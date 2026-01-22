@@ -143,7 +143,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskRequest"
+                "$ref": "#/components/schemas/TaskCreateRequest"
               }
             }
           },
@@ -1451,7 +1451,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskRequest"
+                "$ref": "#/components/schemas/TaskUpdateRequest"
               }
             }
           },
@@ -2446,13 +2446,13 @@
           "fromId": {
             "type": "integer",
             "format": "int64",
-            "description": "선행 일정 ID",
+            "description": "선행 작업 ID (새 작업 생성 시 자기 자신은 0, 수정 시 0 금지)",
             "example": 1
           },
           "toId": {
             "type": "integer",
             "format": "int64",
-            "description": "후행 일정 ID",
+            "description": "후행 작업 ID (새 작업 생성 시 자기 자신은 0, 수정 시 0 금지)",
             "example": 2
           }
         },
@@ -2461,7 +2461,7 @@
           "toId"
         ]
       },
-      "TaskRequest": {
+      "TaskCreateRequest": {
         "type": "object",
         "properties": {
           "title": {
@@ -2498,16 +2498,9 @@
             "description": "난이도 (피보나치 수: 1,2,3,5,8,13,21)",
             "example": 5
           },
-          "removeDependencies": {
-            "type": "array",
-            "description": "제거할 의존 관계 목록",
-            "items": {
-              "$ref": "#/components/schemas/DependencyRequest"
-            }
-          },
           "addDependencies": {
             "type": "array",
-            "description": "추가할 의존 관계 목록",
+            "description": "추가할 의존 관계 목록 (생성 시 각 항목에 fromId 또는 toId 중 하나는 0)",
             "items": {
               "$ref": "#/components/schemas/DependencyRequest"
             }
@@ -2791,6 +2784,66 @@
             "description": "현재 상태"
           }
         }
+      },
+      "TaskUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "작업 제목",
+            "example": "스터디 준비",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "작업 설명",
+            "example": "다음 주 발표 자료 정리",
+            "minLength": 1
+          },
+          "dueDate": {
+            "$ref": "#/components/schemas/DateTimeWithZone",
+            "description": "마감 기한",
+            "example": {
+              "dateTime": "2024-03-01T18:00:00",
+              "zoneId": "Asia/Seoul"
+            }
+          },
+          "importance": {
+            "type": "integer",
+            "format": "int32",
+            "description": "중요도 (1~9)",
+            "example": 5,
+            "maximum": 9,
+            "minimum": 1
+          },
+          "difficulty": {
+            "type": "integer",
+            "format": "int32",
+            "description": "난이도 (피보나치 수: 1,2,3,5,8,13,21)",
+            "example": 5
+          },
+          "removeDependencies": {
+            "type": "array",
+            "description": "제거할 의존 관계 목록 (수정 시 0 사용 금지)",
+            "items": {
+              "$ref": "#/components/schemas/DependencyRequest"
+            }
+          },
+          "addDependencies": {
+            "type": "array",
+            "description": "추가할 의존 관계 목록 (수정 시 0 사용 금지)",
+            "items": {
+              "$ref": "#/components/schemas/DependencyRequest"
+            }
+          }
+        },
+        "required": [
+          "description",
+          "difficulty",
+          "dueDate",
+          "importance",
+          "title"
+        ]
       },
       "ScheduleSimplePatchRequest": {
         "type": "object",
