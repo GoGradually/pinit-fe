@@ -1,5 +1,6 @@
-import type { ScheduleSummary } from '../../types/schedule'
+import type {ScheduleSummary} from '../../types/schedule'
 import './ScheduleCard.css'
+import {scheduleTypeLabel, stateIcon, stateLabel} from "../../constants/schedules.ts";
 
 type ScheduleCardProps = {
   schedule: ScheduleSummary
@@ -8,26 +9,6 @@ type ScheduleCardProps = {
   onStart: (scheduleId: number) => void
   onComplete: (scheduleId: number) => void
   onCancel: (scheduleId: number) => void
-}
-
-const scheduleTypeLabel: Record<NonNullable<ScheduleSummary['scheduleType']>, string> = {
-  DEEP_WORK: '집중 작업',
-  QUICK_TASK: '빠른 일정',
-  ADMIN_TASK: '행정 작업',
-}
-
-const stateLabel: Record<ScheduleSummary['state'], string> = {
-  NOT_STARTED: '미시작',
-  IN_PROGRESS: '진행중',
-  COMPLETED: '완료',
-  SUSPENDED: '일시정지',
-}
-
-const stateIcon: Record<ScheduleSummary['state'], string> = {
-  NOT_STARTED: '☐',  // 빈 박스
-  IN_PROGRESS: '▶',  // >>
-  COMPLETED: '✓',     // 체크
-  SUSPENDED: '⏸',     // 일시정지
 }
 
 /**

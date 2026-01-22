@@ -10,6 +10,7 @@ import type { Task } from '../../types/task'
 import TaskScheduleModal from '../../components/tasks/TaskScheduleModal'
 import { createScheduleFromTask } from '../../api/tasks'
 import { useTaskCache } from '../../context/TaskCacheContext'
+import {scheduleTypeLabelCompressed} from "../../constants/schedules.ts";
 
 const TodayPage = () => {
   const { offsetMinutes } = useTimePreferences()
@@ -99,7 +100,7 @@ const TodayPage = () => {
                   <li key={item.id}>
                     <strong>{item.title}</strong>
                     <span>{dayjs(item.date.dateTime).format('HH:mm')}</span>
-                    {item.scheduleType && <span className="today-page__pill">{item.scheduleType}</span>}
+                    {item.scheduleType && <span className="today-page__pill">{scheduleTypeLabelCompressed[item.scheduleType]}</span>}
                   </li>
                 ))}
               </ul>

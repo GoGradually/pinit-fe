@@ -8,6 +8,7 @@ import { useScheduleCache } from '../../context/ScheduleCacheContext'
 import { useTimePreferences } from '../../context/TimePreferencesContext'
 import './ScheduleDetailModal.css'
 import '../schedules/ScheduleForm.css'
+import {scheduleTypeLabel, stateLabel} from "../../constants/schedules.ts";
 
 type ScheduleDetailModalProps = {
   scheduleId: number
@@ -108,9 +109,9 @@ const ScheduleDetailModal = ({ scheduleId, onClose, onRefresh }: ScheduleDetailM
             <p className="schedule-detail-modal__description">{schedule.description}</p>
             <div className="schedule-detail-modal__meta">
               <span className="schedule-detail-modal__badge schedule-detail-modal__badge--state">
-                {schedule.state}
+                {stateLabel[schedule.state]}
               </span>
-              {schedule.scheduleType && (
+              {scheduleTypeLabel[schedule.scheduleType] && (
                 <span className="schedule-detail-modal__badge">
                   {schedule.scheduleType}
                 </span>
