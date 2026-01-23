@@ -60,8 +60,9 @@ export const formatOffsetLabel = (offsetMinutes: number) => {
 }
 
 export const formatOffset = (offsetMinutes: number) => {
-  const sign = offsetMinutes >= 0 ? '+' : '-'
-  const absolute = Math.abs(offsetMinutes)
+  const safe = Number.isFinite(offsetMinutes) ? offsetMinutes : 0
+  const sign = safe >= 0 ? '+' : '-'
+  const absolute = Math.abs(safe)
   const hours = String(Math.floor(absolute / 60)).padStart(2, '0')
   const minutes = String(absolute % 60).padStart(2, '0')
   return `${sign}${hours}:${minutes}`
@@ -174,14 +175,21 @@ export const toApiDateWithOffset = (
   value: dayjs.Dayjs | Date | string,
   offsetMinutesOverride?: number,
 ): DateWithOffset => {
-  const offsetMinutes = Number.isFinite(offsetMinutesOverride)
-    ? Number(offsetMinutesOverride)
-    : getDisplayOffsetMinutes()
+  const candidateOffset =
+    Number.isFinite(offsetMinutesOverride) && offsetMinutesOverride !== null
+      ? Number(offsetMinutesOverride)
+      : Number.isFinite(getDisplayOffsetMinutes())
+        ? getDisplayOffsetMinutes()
+        : -new Date().getTimezoneOffset()
+
   const normalized = dayjs(value)
-  const safeOffset = Number.isFinite(offsetMinutes) ? offsetMinutes : 0
+  const safeOffset = Number.isFinite(candidateOffset) ? candidateOffset : 0
+  const offset = formatOffset(safeOffset)
+  const verifiedOffset = /^[+-]\\d{2}:\\d{2}$/.test(offset) ? offset : '+00:00'
+
   return {
     date: normalized.format('YYYY-MM-DD'),
-    offset: formatOffset(safeOffset),
+    offset: verifiedOffset,
   }
 }
 
