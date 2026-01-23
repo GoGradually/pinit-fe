@@ -185,7 +185,8 @@ export const toApiDateWithOffset = (
   const normalized = dayjs(value)
   const safeOffset = Number.isFinite(candidateOffset) ? candidateOffset : 0
   const offset = formatOffset(safeOffset)
-  const verifiedOffset = /^[+-]\\d{2}:\\d{2}$/.test(offset) ? offset : '+00:00'
+  // must be "+HH:MM" or "-HH:MM"
+  const verifiedOffset = (/^[+-]\d{2}:\d{2}$/).test(offset) ? offset : '+00:00'
 
   return {
     date: normalized.format('YYYY-MM-DD'),
