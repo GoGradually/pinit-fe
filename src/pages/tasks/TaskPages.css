@@ -77,6 +77,24 @@
   animation: fadeSlideIn 220ms ease;
 }
 
+.task-page__sentinel {
+  padding: 12px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.task-page__retry {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .task-page__item {
   display: flex;
   justify-content: space-between;
