@@ -1,6 +1,6 @@
-import type {ScheduleSummary} from '../../types/schedule'
+import type { ScheduleSummary } from '../../types/schedule'
 import './ScheduleCard.css'
-import {scheduleTypeLabel, stateIcon, stateLabel} from "../../constants/schedules.ts";
+import { scheduleTypeLabel, stateIcon, stateLabel } from '../../constants/schedules.ts'
 
 type ScheduleCardProps = {
   schedule: ScheduleSummary
@@ -76,29 +76,40 @@ const ScheduleCard = ({
         }
       }}
     >
-      <header className="schedule-card__header">
-        <div className="schedule-card__header-left">
-          <button
-            className={[
-              'schedule-card__state-icon',
-              stateClassName,
-              isStateClickable ? 'schedule-card__state-icon--clickable' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            onClick={handleStateIconClick}
-            disabled={!isStateClickable}
-            title={stateLabel[state]}
-            aria-label={`${stateLabel[state]} 상태`}
-          >
-            {stateIcon[state]}
-          </button>
-          <div>
+      <div className="schedule-card__main">
+        <button
+          className={[
+            'schedule-card__state-icon',
+            stateClassName,
+            isStateClickable ? 'schedule-card__state-icon--clickable' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          onClick={handleStateIconClick}
+          disabled={!isStateClickable}
+          title={stateLabel[state]}
+          aria-label={`${stateLabel[state]} 상태`}
+        >
+          {stateIcon[state]}
+        </button>
+        <div className="schedule-card__text">
+          <div className="schedule-card__title-row">
             <p className="schedule-card__title">{title}</p>
             {scheduleType && <p className="schedule-card__subtitle">{scheduleTypeLabel[scheduleType]}</p>}
           </div>
+          {description && <p className="schedule-card__description">{description}</p>}
         </div>
-        <div className="schedule-card__header-actions">
+        <div className="schedule-card__actions">
+          {state === 'NOT_STARTED' && (
+            <button
+              type="button"
+              className="schedule-card__quick-complete"
+              onClick={handleQuickComplete}
+              aria-label="즉시 완료"
+            >
+              ✓ 즉시 완료
+            </button>
+          )}
           <button
             className="schedule-card__delete-btn"
             onClick={handleDeleteClick}
@@ -108,21 +119,7 @@ const ScheduleCard = ({
             🗑️
           </button>
         </div>
-      </header>
-      <p className="schedule-card__description">{description}</p>
-      <footer className="schedule-card__footer">
-        <div className="schedule-card__meta" />
-        {state === 'NOT_STARTED' && (
-          <button
-            type="button"
-            className="schedule-card__quick-complete"
-            onClick={handleQuickComplete}
-            aria-label="즉시 완료"
-          >
-            ✓ 즉시 완료
-          </button>
-        )}
-      </footer>
+      </div>
     </article>
   )
 }
