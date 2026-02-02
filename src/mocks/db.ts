@@ -1,7 +1,12 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 import type { DateTimeWithZone, DateWithOffset } from '../types/datetime'
 import type { Task } from '../types/task'
 import type { ScheduleResponse, ScheduleState } from '../types/schedule'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 export type MockUser = {
   id: number
@@ -11,15 +16,22 @@ export type MockUser = {
   zoneOffset: string
 }
 
-const makeDateTime = (offsetDays: number, hour: number, minute = 0, zoneId = 'UTC'): DateTimeWithZone => ({
-  dateTime: dayjs().add(offsetDays, 'day').hour(hour).minute(minute).second(0).format('YYYY-MM-DDTHH:mm:ss'),
-  zoneId,
-})
+const makeDateTime = (offsetDays: number, hour: number, minute = 0, zoneId = 'Asia/Seoul'): DateTimeWithZone => {
+  const base = dayjs().tz(zoneId).add(offsetDays, 'day').hour(hour).minute(minute).second(0)
+  return {
+    dateTime: base.format('YYYY-MM-DDTHH:mm:ss'),
+    zoneId,
+  }
+}
 
-const makeDateWithOffset = (offsetDays: number, offset = '+00:00'): DateWithOffset => ({
-  date: dayjs().add(offsetDays, 'day').format('YYYY-MM-DD'),
-  offset,
-})
+const makeDateWithOffset = (offsetDays: number, zoneId = 'Asia/Seoul'): DateWithOffset => {
+  const base = dayjs().tz(zoneId).add(offsetDays, 'day').hour(0).minute(0).second(0)
+  return {
+    date: base.format('YYYY-MM-DD'),
+    zoneId,
+    offset: base.format('Z'),
+  }
+}
 
 let taskSeq = 3
 let scheduleSeq = 4
@@ -34,7 +46,7 @@ export const mockTasks: Task[] = [
     id: 1,
     title: 'UI 리서치 정리',
     description: '다음 스프린트 준비용',
-    dueDate: makeDateWithOffset(0, '+09:00'),
+    dueDate: makeDateWithOffset(0, 'Asia/Seoul'),
     importance: 7,
     difficulty: 3,
     isCompleted: false,
@@ -45,7 +57,7 @@ export const mockTasks: Task[] = [
     id: 2,
     title: '푸시 알림 세팅',
     description: '웹 푸시 키/토큰 확인',
-    dueDate: makeDateWithOffset(1, '+09:00'),
+    dueDate: makeDateWithOffset(1, 'Asia/Seoul'),
     importance: 6,
     difficulty: 2,
     isCompleted: false,
@@ -56,7 +68,7 @@ export const mockTasks: Task[] = [
     id: 3,
     title: '통계 뷰 QA',
     description: '주간 통계 지표 검증',
-    dueDate: makeDateWithOffset(-1, '+09:00'),
+    dueDate: makeDateWithOffset(-1, 'Asia/Seoul'),
     importance: 5,
     difficulty: 1,
     isCompleted: true,
