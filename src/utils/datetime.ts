@@ -64,25 +64,6 @@ export const formatOffset = (offsetMinutes: number) => {
   return `${sign}${hours}:${minutes}`
 }
 
-export const parseOffsetString = (value?: string | null) => {
-  if (!value) return null
-  const trimmed = value.trim()
-  const match =
-    trimmed.match(/^UTC?([+-])(\d{1,2})(?::?(\d{2}))?$/i) || trimmed.match(/^([+-])(\d{1,2}):?(\d{2})?$/)
-  if (match) {
-    const [, sign, hours, minutes = '0'] = match
-    const offset = Number(hours) * 60 + Number(minutes)
-    return sign === '-' ? -offset : offset
-  }
-
-  const tz = getTz()
-  if (tz?.zone && tz.zone(trimmed)) {
-    return dayjs().tz(trimmed).utcOffset()
-  }
-
-  return null
-}
-
 const isDateTimeWithZone = (value: unknown): value is DateTimeWithZone => {
   if (!value || typeof value !== 'object') return false
   return 'dateTime' in value && 'zoneId' in value
@@ -190,6 +171,3 @@ export const toDayjsFromDateWithOffset = (value: DateWithOffset, zoneIdOverride?
 
 export const formatDateWithOffset = (value: DateWithOffset, format = 'M/D') =>
   toDayjsFromDateWithOffset(value).format(format)
-
-export const toDateFromDateWithOffset = (value: DateWithOffset) =>
-  toDayjsFromDateWithOffset(value).toDate()

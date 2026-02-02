@@ -1,10 +1,8 @@
 import { ensureDeviceId, setAuthTokens } from './authTokens'
-import { AUTH_BASE_URL, buildAuthUrl } from './config'
+import { buildAuthUrl } from './config'
 import { httpClient } from './httpClient'
 
 export type AuthProvider = 'naver'
-
-export const getAuthBaseUrl = () => AUTH_BASE_URL
 
 export type LoginResponse = {
   token?: string

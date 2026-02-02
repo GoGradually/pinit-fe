@@ -91,6 +91,24 @@ const SchedulesTabPage = () => {
     refetchSchedulesRaw()
   }
 
+  const refreshScheduleDetail = async (
+    scheduleId: number,
+    syncState?: ScheduleResponse['state'],
+  ): Promise<ScheduleResponse | null> => {
+    try {
+      const detail = await fetchScheduleDetail(scheduleId)
+      setSchedule(detail)
+      updateScheduleState(scheduleId, detail.state)
+      if (detail.taskId != null) {
+        await syncTaskStateWithSchedule(detail.taskId, syncState ?? detail.state)
+      }
+      return detail
+    } catch (error) {
+      console.error('Failed to refresh schedule detail:', error)
+      return null
+    }
+  }
+
   const handleChangeWeek = (offset: 1 | -1) => {
     setWeekDirection(offset > 0 ? 'forward' : 'backward')
     goToWeek(offset)
@@ -116,17 +134,14 @@ const SchedulesTabPage = () => {
   }, [schedulesByDate, setSchedule])
 
   const handleRefresh = () => {
-    console.log('🔄 Manual refresh triggered')
     refetchOverdue()
     refetchSchedules()
     refetchWeeklyStats()
   }
 
   const handleDelete = async (scheduleId: number) => {
-    console.log(`🗑️ Delete schedule ${scheduleId}`)
     try {
       await deleteSchedule(scheduleId)
-      console.log(`✅ Schedule deleted: ${scheduleId}`)
       if (activeScheduleId === scheduleId) {
         setActiveSchedule(null)
       }
@@ -139,21 +154,12 @@ const SchedulesTabPage = () => {
   }
 
   const handleStart = async (scheduleId: number) => {
-    console.log(`▶️ Start schedule ${scheduleId}`)
     try {
       await startSchedule(scheduleId)
-      console.log(`✅ Schedule started: ${scheduleId}`)
       updateScheduleState(scheduleId, 'IN_PROGRESS')
-      try {
-        const detail = await fetchScheduleDetail(scheduleId)
-        setSchedule(detail)
+      const detail = await refreshScheduleDetail(scheduleId, 'IN_PROGRESS')
+      if (detail) {
         setActiveSchedule(scheduleId)
-        updateScheduleState(scheduleId, detail.state)
-        if (detail.taskId != null) {
-          await syncTaskStateWithSchedule(detail.taskId, detail.state)
-        }
-      } catch (error) {
-        console.error('⚠️ Failed to cache active schedule detail after start:', error)
       }
       refetchSchedules()
     } catch (error) {
@@ -163,23 +169,13 @@ const SchedulesTabPage = () => {
   }
 
   const handleCancel = async (scheduleId: number) => {
-    console.log(`✕ Cancel schedule ${scheduleId}`)
     try {
       await cancelSchedule(scheduleId)
-      console.log(`✅ Schedule cancelled: ${scheduleId}`)
       updateScheduleState(scheduleId, 'NOT_STARTED')
       if (activeScheduleId === scheduleId) {
         setActiveSchedule(null)
       }
-      try {
-        const detail = await fetchScheduleDetail(scheduleId)
-        setSchedule(detail)
-        if (detail.taskId != null) {
-          await syncTaskStateWithSchedule(detail.taskId, 'NOT_STARTED')
-        }
-      } catch (error) {
-        console.error('⚠️ Failed to refresh schedule detail after cancel:', error)
-      }
+      await refreshScheduleDetail(scheduleId, 'NOT_STARTED')
       refetchSchedules()
     } catch (error) {
       console.error(`❌ Cancel failed for schedule ${scheduleId}:`, error)
@@ -188,23 +184,13 @@ const SchedulesTabPage = () => {
   }
 
   const handleComplete = async (scheduleId: number) => {
-    console.log(`✅ Complete schedule ${scheduleId}`)
     try {
       await completeSchedule(scheduleId)
       updateScheduleState(scheduleId, 'COMPLETED')
       if (activeScheduleId === scheduleId) {
         setActiveSchedule(null)
       }
-      try {
-        const detail = await fetchScheduleDetail(scheduleId)
-        setSchedule(detail)
-        updateScheduleState(scheduleId, detail.state)
-        if (detail.taskId != null) {
-          await syncTaskStateWithSchedule(detail.taskId, 'COMPLETED')
-        }
-      } catch (error) {
-        console.error('⚠️ Failed to refresh schedule detail after complete:', error)
-      }
+      await refreshScheduleDetail(scheduleId, 'COMPLETED')
       refetchSchedules()
       refetchOverdue()
     } catch (error) {

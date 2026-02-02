@@ -1,12 +1,6 @@
 import { buildNotificationUrl } from './config'
 import { httpClient } from './httpClient'
 
-export const getNotificationBaseUrl = () => buildNotificationUrl('/')
-
-export type VapidPublicKeyResponse = {
-  publicKey: string
-}
-
 export type PushTokenRequest = {
   deviceId: string
   token: string
@@ -26,9 +20,6 @@ export const unsubscribePushToken = (deviceId: string, token: string) =>
     method: 'POST',
     json: { deviceId, token } satisfies PushTokenRequest,
   })
-
-export const registerPushSubscription = (deviceId: string, token: string) =>
-  subscribePushToken(deviceId, token)
 
 export const fetchPushSubscriptionStatus = (deviceId: string) =>
   httpClient<boolean>(buildNotificationUrl(`/push/subscribed?deviceId=${deviceId}`))

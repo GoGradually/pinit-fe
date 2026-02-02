@@ -18,8 +18,3 @@ export type WeeklyStatisticsView = {
   adminWorkRatio: number
   quickWorkRatio: number
 }
-
-export type WeeklyStatisticsSet = {
-  current: WeeklyStatisticsView | null
-  previous: WeeklyStatisticsView | null
-}

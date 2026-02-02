@@ -44,12 +44,6 @@ export type TaskListResponse = {
   empty?: boolean
 }
 
-export type TaskCursorResponse = {
-  items: Task[]
-  nextCursor: string | null
-  hasNext?: boolean
-}
-
 export type TaskArchiveCursorResponse = {
   items: Task[]
   nextCursor: string | null

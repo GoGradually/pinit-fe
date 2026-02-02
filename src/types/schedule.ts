@@ -25,11 +25,6 @@ export type ScheduleResponse = {
   duration?: string
 }
 
-export type DependencyRequest = {
-  fromId: number
-  toId: number
-}
-
 export type ScheduleRequest = {
   title: string
   description: string

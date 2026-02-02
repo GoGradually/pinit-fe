@@ -13,21 +13,10 @@ import { useToast } from '../../context/ToastContext'
 import { dispatchScheduleChanged } from '../../utils/events'
 import { useScheduleTaskSync } from '../../utils/scheduleTaskSync'
 
-// 실제 백엔드 상태에 맞게 수정
-// NOT_STARTED: 시작, 완료 가능
 const allowedStartStates: ScheduleState[] = ['NOT_STARTED', 'SUSPENDED']
-// IN_PROGRESS: 일시정지, 취소, 완료 가능
 const allowedPauseStates: ScheduleState[] = ['IN_PROGRESS']
 const allowedCompleteStates: ScheduleState[] = ['NOT_STARTED', 'IN_PROGRESS']
-// 취소는 IN_PROGRESS, SUSPENDED, COMPLETED 상태에서만 가능
 const allowedCancelStates: ScheduleState[] = ['IN_PROGRESS', 'SUSPENDED', 'COMPLETED']
-
-console.log('📌 Allowed states configuration:', {
-  allowedStartStates,
-  allowedPauseStates,
-  allowedCompleteStates,
-  allowedCancelStates
-})
 
 type UseScheduleActionsResult = {
   currentState: ScheduleState
@@ -64,7 +53,6 @@ const useScheduleActions = (
 
   useEffect(() => {
     setCurrentState(initialState)
-    console.log(`🔄 State changed for schedule ${scheduleId}:`, { to: initialState })
   }, [initialState, scheduleId])
 
   useEffect(() => {
@@ -73,29 +61,13 @@ const useScheduleActions = (
     }
   }, [cachedState, currentState])
 
-  const canStart = useMemo(() => {
-    const result = allowedStartStates.includes(currentState)
-    console.log(`🔍 canStart check:`, { scheduleId, currentState, allowedStartStates, result })
-    return result
-  }, [currentState, scheduleId])
+  const canStart = useMemo(() => allowedStartStates.includes(currentState), [currentState])
 
-  const canPause = useMemo(() => {
-    const result = allowedPauseStates.includes(currentState)
-    console.log(`🔍 canPause check:`, { scheduleId, currentState, allowedPauseStates, result })
-    return result
-  }, [currentState, scheduleId])
+  const canPause = useMemo(() => allowedPauseStates.includes(currentState), [currentState])
 
-  const canComplete = useMemo(() => {
-    const result = allowedCompleteStates.includes(currentState)
-    console.log(`🔍 canComplete check:`, { scheduleId, currentState, allowedCompleteStates, result })
-    return result
-  }, [currentState, scheduleId])
+  const canComplete = useMemo(() => allowedCompleteStates.includes(currentState), [currentState])
 
-  const canCancel = useMemo(() => {
-    const result = allowedCancelStates.includes(currentState)
-    console.log(`🔍 canCancel check:`, { scheduleId, currentState, allowedCancelStates, result })
-    return result
-  }, [currentState, scheduleId])
+  const canCancel = useMemo(() => allowedCancelStates.includes(currentState), [currentState])
 
   const mutate = async (handler: (id: number) => Promise<void>, nextState: ScheduleState, message: string) => {
     if (!scheduleId) {
@@ -103,12 +75,10 @@ const useScheduleActions = (
       return
     }
 
-    console.log(`🔄 Mutating schedule ${scheduleId}: ${currentState} → ${nextState}`)
     setIsMutating(true)
 
     try {
       await handler(scheduleId)
-      console.log(`✅ Mutation success: ${scheduleId} is now ${nextState}`)
       setCurrentState(nextState)
       updateScheduleState(scheduleId, nextState)
       setLastMessage(message)
@@ -134,7 +104,6 @@ const useScheduleActions = (
   const start = async () => {
     if (!canStart || isMutating) return
     await mutate(startSchedule, 'IN_PROGRESS', '일정을 시작했습니다.')
-    // 시작 후 활성 일정 갱신
     try {
       const activeId = await fetchActiveScheduleId()
       if (activeId) {

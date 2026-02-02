@@ -3,7 +3,6 @@ import { httpClient } from './httpClient'
 import type {
   Task,
   TaskArchiveCursorResponse,
-  TaskCursorResponse,
   TaskListResponse,
   TaskRequest,
   TaskScheduleRequest,
@@ -16,12 +15,6 @@ const TASK_API_VERSION = 'v2'
 type ListParams = {
   page?: number
   size?: number
-  readyOnly?: boolean
-}
-
-type CursorParams = {
-  size?: number
-  cursor?: string | null
   readyOnly?: boolean
 }
 
@@ -76,24 +69,6 @@ export const fetchTasks = async ({ page = 0, size = 20, readyOnly = false }: Lis
     first: response.first,
     last: response.last,
     empty: response.empty,
-  }
-}
-
-export const fetchTasksByCursor = async (
-  { size = 20, cursor, readyOnly = false }: CursorParams,
-): Promise<TaskCursorResponse> => {
-  const query = new URLSearchParams({
-    size: String(size),
-    readyOnly: String(readyOnly),
-  })
-  if (cursor) query.set('cursor', cursor)
-  const response = await httpClient<TaskCursorApiResponse>(
-    buildApiUrl(`/tasks/cursor?${query.toString()}`, TASK_API_VERSION),
-  )
-  return {
-    items: normalizeTaskList(response.data),
-    nextCursor: response.nextCursor ?? null,
-    hasNext: response.hasNext,
   }
 }
 

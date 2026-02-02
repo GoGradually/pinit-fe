@@ -20,11 +20,6 @@ export const ensureDeviceId = () => {
   return next
 }
 
-export const getDeviceId = () => {
-  if (!hasWindow()) return null
-  return window.localStorage.getItem(DEVICE_ID_KEY)
-}
-
 export const setAuthTokens = (tokens: { accessToken?: string | null; refreshToken?: string | null }) => {
   if (!hasWindow()) return
   // 로그인 성공 시 로그아웃 마커 제거
