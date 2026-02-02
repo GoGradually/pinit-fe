@@ -7,7 +7,7 @@ import useScheduleDetail from '../../../hooks/useScheduleDetail'
 import { useToast } from '../../../context/ToastContext'
 import { useTimePreferences } from '../../../context/TimePreferencesContext'
 import './ScheduleFormPage.css'
-import { updateSchedule } from '../../../api/schedulesV1'
+import { updateSchedule } from '../../../api/schedules'
 
 const ScheduleEditPage = () => {
   const { scheduleId } = useParams()

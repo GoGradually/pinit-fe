@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import ScheduleForm from '../schedules/ScheduleForm'
-import { createSchedule, updateSchedule } from '../../api/schedulesV1'
+import { createSchedule, updateSchedule } from '../../api/schedules'
 import { toApiDateTimeWithZone, toDateFromApi } from '../../utils/datetime'
 import type { ScheduleFormValues, ScheduleResponse } from '../../types/schedule'
 import { useToast } from '../../context/ToastContext'

@@ -3,7 +3,7 @@ import type dayjs from 'dayjs'
 import { getWeekDays, toApiDateTimeWithZone, toDateKey } from '../utils/datetime'
 import type { DateSchedulePresence } from '../types/schedule'
 import type { ScheduleResponse } from '../types/schedule'
-import { fetchWeeklySchedules } from '../api/schedulesV1'
+import { fetchWeeklySchedules } from '../api/schedules'
 
 type Options = {
   weekStart: dayjs.Dayjs

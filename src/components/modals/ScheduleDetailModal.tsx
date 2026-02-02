@@ -1,5 +1,5 @@
 import useScheduleDetail from '../../hooks/useScheduleDetail'
-import { deleteSchedule } from '../../api/schedulesV1'
+import { deleteSchedule } from '../../api/schedules'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../context/ToastContext'
 import { formatDateTimeWithZone } from '../../utils/datetime'

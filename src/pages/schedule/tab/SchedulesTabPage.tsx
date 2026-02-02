@@ -16,7 +16,7 @@ import {
   completeSchedule,
   fetchScheduleDetail,
   updateSchedule,
-} from '../../../api/schedulesV1.ts'
+} from '../../../api/schedules.ts'
 import type { ScheduleResponse, ScheduleSummary } from '../../../types/schedule'
 import useWeeklyStatistics from '../../../hooks/useWeeklyStatistics.ts'
 import { formatMinutesToTime } from '../../../utils/statisticsTransform.ts'
@@ -314,7 +314,7 @@ const SchedulesTabPage = () => {
       ) : null}
       <div
         className={['week-transition', `week-transition--${weekDirection}`].join(' ')}
-        key={currentWeekStart.toISOString()}
+        key={currentWeekStart.format('YYYY-MM-DD')}
       >
         <WeeklyDateStrip
           weekStart={currentWeekStart}
@@ -330,7 +330,7 @@ const SchedulesTabPage = () => {
           'week-transition',
           `week-transition--${weekDirection}`,
         ].join(' ')}
-        key={`${currentWeekStart.toISOString()}-stats`}
+        key={`${currentWeekStart.format('YYYY-MM-DD')}-stats`}
       >
         {isWeeklyStatsLoading ? (
           <span>이번 주 총 작업 시간을 불러오는 중...</span>
