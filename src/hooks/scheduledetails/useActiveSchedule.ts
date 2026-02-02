@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { fetchActiveScheduleId, fetchScheduleDetail } from '../../api/schedulesV1'
+import { fetchScheduleDetail } from '../../api/schedules'
+import { fetchActiveScheduleId } from '../../api/member'
 import type { ScheduleSummary } from '../../types/schedule.ts'
 import { useScheduleCache } from '../../context/ScheduleCacheContext'
 import { dispatchTaskChanged } from '../../utils/events'
