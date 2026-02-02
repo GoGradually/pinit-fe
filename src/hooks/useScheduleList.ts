@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import type dayjs from 'dayjs'
 import type { ScheduleSummary } from '../types/schedule'
 import { toDateKey } from '../utils/datetime'
-import { fetchSchedules } from '../api/schedulesV1'
+import { fetchSchedules } from '../api/schedules'
 
 type UseScheduleListReturn = {
   schedules: ScheduleSummary[]

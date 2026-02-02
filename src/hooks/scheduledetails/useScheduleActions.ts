@@ -3,9 +3,9 @@ import {
   suspendSchedule,
   completeSchedule,
   cancelSchedule,
-  fetchActiveScheduleId,
   fetchScheduleDetail,
-} from '../../api/schedulesV1.ts'
+} from '../../api/schedules.ts'
+import { fetchActiveScheduleId } from '../../api/member'
 import { useEffect, useMemo, useState } from 'react'
 import type { ScheduleState } from '../../types/schedule.ts'
 import { useScheduleCache } from '../../context/ScheduleCacheContext'
