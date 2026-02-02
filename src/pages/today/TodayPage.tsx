@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import { fetchSchedules } from '../../api/schedulesV1'
+import { fetchSchedules } from '../../api/schedules'
 import { fetchTasks } from '../../api/tasks'
 import { formatDateWithOffset, getTodayWithOffset, toApiDateTimeWithZone } from '../../utils/datetime'
 import { useTimePreferences } from '../../context/TimePreferencesContext'
